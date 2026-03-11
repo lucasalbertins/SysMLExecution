@@ -12,7 +12,7 @@ public class AcceptActionAdapter /* implements IAcceptAction*/ {
     public AcceptActionAdapter(AcceptActionUsage action) {
         this.action = action;
     }
-    //
+    
     /*
     @Override
     public String getName() {
