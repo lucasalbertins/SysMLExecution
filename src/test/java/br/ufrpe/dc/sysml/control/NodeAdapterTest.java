@@ -59,8 +59,8 @@ class NodeAdapterTest {
 
             NodeAdapter adapter = new NodeAdapter(action);
 
-            ISuccession[] incomings = adapter.getIncomings();
-            ISuccession[] outgoings = adapter.getOutgoings();
+            List<ISuccession> incomings = adapter.getIncomings();
+            List<ISuccession> outgoings = adapter.getOutgoings();
 
             assertNotNull(incomings,
                     "getIncomings() não deve retornar null");

@@ -1,6 +1,7 @@
 package adapters.behavior.actions.nodes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
@@ -8,17 +9,15 @@ import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.TransitionUsage;
 
 import adapters.utils.AdapterUtils;
-import adapters.utils.InitialNode;
-import adapters.utils.FinalNode;
 import adapters.utils.NamedElementAdapter;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
 
 public class NodeAdapter extends NamedElementAdapter implements INode {
 
-    private Element nodeElement; // o nó em si
-    private ISuccession[] incomings;
-    private ISuccession[] outgoings;
+    protected Element nodeElement; // o nó em si
+    protected List<ISuccession> incomings;
+    protected List<ISuccession> outgoings;
 
     public NodeAdapter(Element nodeElement) {
         super(nodeElement);
@@ -67,17 +66,17 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
             }
         }
 
-        this.incomings = incomingList.toArray(new ISuccession[0]);
-        this.outgoings = outgoingList.toArray(new ISuccession[0]);
+        this.incomings = incomingList;
+        this.outgoings = outgoingList;
     }
 
     @Override
-    public ISuccession[] getIncomings() {
+    public List<ISuccession> getIncomings() {
         return incomings;
     }
 
     @Override
-    public ISuccession[] getOutgoings() {
+    public List<ISuccession> getOutgoings() {
         return outgoings;
     }
     

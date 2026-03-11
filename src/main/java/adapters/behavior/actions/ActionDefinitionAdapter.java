@@ -12,14 +12,13 @@ import org.omg.sysml.lang.sysml.FlowUsage;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.TransitionUsage;
 
+import adapters.behavior.actions.nodes.ControlNodeAdapter;
+import adapters.behavior.actions.nodes.FlowUsageAdapter;
 import adapters.utils.FinalNode;
 import adapters.utils.InitialNode;
 import adapters.utils.NamedElementAdapter;
 import adapters.utils.ParameterAdapter;
-import adapters.behavior.actions.nodes.ControlNodeAdapter;
-import adapters.behavior.actions.nodes.FlowUsageAdapter;
 import interfaces.behavior.actions.IActionDefinition;
-import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.utils.IParameter;

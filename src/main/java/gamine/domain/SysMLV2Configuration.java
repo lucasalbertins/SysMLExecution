@@ -3,13 +3,13 @@ package gamine.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapters.behavior.actions.SuccessionAdapter;
+import interfaces.behavior.actions.ISuccession;
 
 public class SysMLV2Configuration {
 
-    public List<SuccessionAdapter> successions;
+    public List<ISuccession> successions;
 
-    public SysMLV2Configuration(List<SuccessionAdapter> succs) {
+    public SysMLV2Configuration(List<ISuccession> succs) {
         this.successions = succs;
     }
 

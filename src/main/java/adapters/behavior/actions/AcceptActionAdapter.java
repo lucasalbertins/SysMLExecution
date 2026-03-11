@@ -2,9 +2,6 @@ package adapters.behavior.actions;
 
 //import org.eclipse.emf.common.util.EList;
 import org.omg.sysml.lang.sysml.AcceptActionUsage;
-import org.omg.sysml.lang.sysml.Feature;
-import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
-import org.omg.sysml.lang.sysml.ReferenceUsage;
 
 public class AcceptActionAdapter /* implements IAcceptAction*/ {
     private final AcceptActionUsage action;
