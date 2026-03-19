@@ -1,13 +1,7 @@
 package adapters.behavior.actions.nodes;
 
-import gamine.domain.SysMLV2Configuration;
-import interfaces.behavior.actions.nodes.INode;
-
 public class MergeNodeCommand extends ActionNodeCommand {
-    @Override
-    public void execute(INode node, SysMLV2Configuration configuration) {
-        // MergeNode: dispara com qualquer incoming ativo (diferente do Join)
-        removeIncomings(node, configuration);
-        addOutgoings(node, configuration);
-    }
+    // A manipulação de listas é idêntica à do ActionNodeCommand.
+    // O que diferencia o MergeNode do JoinNode é a regra de disparo (presente no ActionSemantics),
+    // e não a manipulação de successions em si.
 }

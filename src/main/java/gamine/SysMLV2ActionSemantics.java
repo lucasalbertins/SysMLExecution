@@ -1,14 +1,11 @@
 package gamine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.omg.sysml.lang.sysml.ActionDefinition;
+import java.util.stream.Collectors;
 
 import adapters.behavior.actions.ActionDefinitionAdapter;
 import adapters.behavior.actions.ActionUsageAdapter;
@@ -22,12 +19,10 @@ import obp3.runtime.sli.SemanticRelation;
 
 public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Configuration> {
 
-    private ActionDefinition actDef;
     private ActionDefinitionAdapter actionDefinition;
 
     public SysMLV2ActionSemantics(ActionUsageAdapter usage) {
-        this.actDef = usage.getActionDefinition();
-        this.actionDefinition = new ActionDefinitionAdapter(actDef);
+        this.actionDefinition = new ActionDefinitionAdapter(usage.getActionDefinition());
     }
 
     @Override
@@ -35,14 +30,13 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         System.out.println("\n[Initial] Buscando estado inicial");
         List<ISuccession> initialSuccessions = new ArrayList<>();
         
-        for(INode node: actionDefinition.getNodes()) {
+        for (INode node: actionDefinition.getNodes()) {
         	if (node instanceof ControlNodeAdapter && 
         			((ControlNodeAdapter)node).isInitialNode() ) {
         		System.out.println("Produzindo token na succession inicial (source: start): " + node.getID());
         		initialSuccessions.addAll(node.getOutgoings());
 			}
         }
-        
         return List.of(new SysMLV2Configuration(initialSuccessions));
     }
 
@@ -63,38 +57,40 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
     }
 
     private boolean allIncomingsActive(INode node, SysMLV2Configuration configuration) {
-        Set<String> requiredIncomingIds = new HashSet<>();
-        
-        if (node != null) {
-            for (ISuccession inc : node.getIncomings()) requiredIncomingIds.add(inc.getID());
-        }
-        // Retorna true se TODAS as entradas obrigatórias estiverem ativas na configuration atual
-        return requiredIncomingIds.stream().allMatch(id -> configuration.successions.stream().anyMatch(s -> s.getID().equals(id)));
+        if (node == null || node.getIncomings().isEmpty()) return true;
+
+        // Converte as successions ativas em um Set de IDs
+        Set<String> activeIds = configuration.successions.stream()
+                .map(ISuccession::getID)
+                .collect(Collectors.toSet());
+
+        // Verifica se todos os IDs de entrada obrigatórios estão no Set de ativos
+        return node.getIncomings().stream()
+                .map(ISuccession::getID)
+                .allMatch(activeIds::contains);
     }
 
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
-        System.out.println("\n[Execute] Executando nó: " + node.getDeclaredName());
-        
         if (node != null) {
-            System.out.println("[Execute] Acionando execute via NodeCommandFactory");
+        	System.out.println("\n[Execute] Executando nó: " + node.getDeclaredName() + " via NodeCommandFactory");
             NodeCommandFactory.create(node).execute(node, configuration);
         }
         return List.of(calculateNextState(node, configuration));
     }
 
     private SysMLV2Configuration calculateNextState(INode node, SysMLV2Configuration current) {
-        System.out.println("[State] Calculando próximo estado");
+        //System.out.println("[State] Calculando próximo estado");
         List<ISuccession> nextSuccessions = new ArrayList<>(current.successions);
         
         // FASE DE CONSUMO
         nextSuccessions.removeIf(token -> {
             INode target = token.getTarget();
-            if (target == null || target.getElement() == null) return false;
+            if (target == null) return false;
 
             // Tenta consumir batendo o ID exato
-            if (target.getElement().getElementId().equals(node.getID())) {
-                System.out.println("Consumido (por ID): " + token.getID());
+            if (target.getID().equals(node.getID())) {
+                //System.out.println("Consumido (por ID): " + token.getID());
                 return true;
             }
             return false;
@@ -108,9 +104,8 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         }
         for (SuccessionAdapter outgoing : outgoings) {
             nextSuccessions.add(outgoing);
-            System.out.println("Produzido: " + outgoing.getID());
+            //System.out.println("Produzido: " + outgoing.getID());
         }
-
         return new SysMLV2Configuration(nextSuccessions);
     }
 }

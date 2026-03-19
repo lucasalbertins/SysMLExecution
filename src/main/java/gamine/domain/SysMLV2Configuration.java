@@ -8,6 +8,7 @@ import interfaces.behavior.actions.ISuccession;
 public class SysMLV2Configuration {
 
     public List<ISuccession> successions;
+    // List<IFlow>
 
     public SysMLV2Configuration(List<ISuccession> succs) {
         this.successions = succs;

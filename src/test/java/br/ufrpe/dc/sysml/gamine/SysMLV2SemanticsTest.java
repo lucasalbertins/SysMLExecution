@@ -10,6 +10,7 @@ import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 
+import adapters.behavior.actions.ActionDefinitionAdapterRegistry;
 import adapters.behavior.actions.ActionUsageAdapter;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import gamine.SysMLV2ActionSemantics;
@@ -22,6 +23,7 @@ class SysMLV2SemanticsTest {
 
     private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
+    private static ActionDefinitionAdapterRegistry registry;
 
     @BeforeAll
     static void init() {
@@ -30,6 +32,8 @@ class SysMLV2SemanticsTest {
         rootNamespace = (Namespace) spec.getRootNamespace();
         System.out.println("SimpleSuccession.sysml loaded");
         assertNotNull(rootNamespace, "Namespace não deve ser nulo");
+        registry = new ActionDefinitionAdapterRegistry(rootNamespace);
+        assertNotNull(registry, "Registry não deve ser nulo");
     }
 
     // Busca recursiva genérica por nome e tipo
@@ -68,7 +72,6 @@ class SysMLV2SemanticsTest {
     
     // Cria a semântica a partir de uma ActionUsage
     private SysMLV2ActionSemantics createSemantics(String actionName) {
-
         ActionUsageAdapter usageAdapter = getActionUsageAdapter(actionName);
         return new SysMLV2ActionSemantics(usageAdapter);
     }
@@ -82,20 +85,19 @@ class SysMLV2SemanticsTest {
         System.out.println(result);
     }
 
-    @Test
-    void testDFSAgain() {
-        var semantics = createSemantics("test");
-        var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
-        var dfs = new DepthFirstTraversal<>(rootedGraph);
-        var result = dfs.runAlone();
-        System.out.println(result);
-    }
+//    @Test
+//    void testDFSAgain() {
+//        var semantics = createSemantics("test");
+//        var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
+//        var dfs = new DepthFirstTraversal<>(rootedGraph);
+//        var result = dfs.runAlone();
+//        System.out.println(result);
+//    }
 
     @Test
     void testSequencer() {
         var semantics = createSemantics("test");
-        var deterministic =
-                ToDetermistic.randomPolicy(semantics, System.nanoTime());
+        var deterministic = ToDetermistic.randomPolicy(semantics, System.nanoTime());
         var sequencer = new Sequencer<>(deterministic);
         var result = sequencer.runAlone();
         System.out.println(result);
