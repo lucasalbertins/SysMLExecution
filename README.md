@@ -21,10 +21,10 @@ Follow the steps below to properly configure the development environment.
 - Edit the file `src/main/resources/application.properties` with paths specific to your machine:
 ```properties 
 # Absolute path to the project's model folder
-app.baseFilePath=C:/.../sysml/src/main/java/sysml
+app.baseFilePath=C:/Users/.../SysMLExecution/src/main/resources/sysmlmodels
 
 # Absolute path to the Pilot Implementation standard library
-app.systemLibPath=C:/.../SySML-v2-Pilot-Implementation/sysml.library
+app.systemLibPath=C:/Users/.../SySML-v2-Pilot-Implementation/sysml.library
 ```
 
 ## 3. GitHub Packages Authentication (settings.xml)
