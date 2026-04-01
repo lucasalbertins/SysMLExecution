@@ -10,23 +10,21 @@ import adapters.behavior.actions.ActionUsageAdapter;
 import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import gamine.SysMLV2ActionSemantics;
-import obp3.Sequencer;
 import obp3.sli.core.operators.SemanticRelation2RootedGraph;
-import obp3.sli.core.operators.ToDetermistic;
 import obp3.traversal.dfs.DepthFirstTraversal;
 
-class SysMLV2SemanticsTest {
-
-    private static SysMLV2Spec spec;
+public class ForkJoinNodeGamineTest {
+	
+	private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
     private static ActionUsageAdapterRegistry registry;
 
     @BeforeAll
     static void init() {
         spec = new SysMLV2Spec();
-        spec.parseFile("behavior/SimpleSuccession.sysml");
+        spec.parseFile("control/ForkJoinExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        System.out.println("SimpleSuccession.sysml loaded");
+        System.out.println("ForkJoinExample.sysml loaded");
         assertNotNull(rootNamespace, "Namespace não deve ser nulo");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
         assertNotNull(registry, "Registry não deve ser nulo");
@@ -37,22 +35,15 @@ class SysMLV2SemanticsTest {
         ActionUsageAdapter usageAdapter = registry.getByDeclaredName(actionName).getFirst();
         return new SysMLV2ActionSemantics(usageAdapter);
     }
+    // Produz todos os outgoings do Fork, navegando um por um em sequência (ordem aleatória).
+    // Após isso, consome todos os incomings no Join.
 
     @Test
     void testDFS() {
-        var semantics = createSemantics("test");
+        var semantics = createSemantics("brake");
         var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
         var dfs = new DepthFirstTraversal<>(rootedGraph);
         var result = dfs.runAlone();
-        System.out.println(result);
-    }
-
-    @Test
-    void testSequencer() {
-        var semantics = createSemantics("test");
-        var deterministic = ToDetermistic.randomPolicy(semantics, System.nanoTime());
-        var sequencer = new Sequencer<>(deterministic);
-        var result = sequencer.runAlone();
         System.out.println(result);
     }
 }

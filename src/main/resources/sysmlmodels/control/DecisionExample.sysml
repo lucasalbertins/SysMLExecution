@@ -6,17 +6,15 @@ package DecisionExample {
 	part battery;
 	part powerSystem;
 	
-	action def MonitorBattery { out charge : Real; }
+	action def MonitorBattery { out charge : Real default 80.0; }
 	action def AddCharge { in charge : Real; }
 	action def EndCharging;
 	
 	action def ChargeBattery {
 		first start;
-
-		then merge continueCharging;
 		
 		then action monitor : MonitorBattery {
-			out batteryCharge : Real;
+			out batteryCharge : Real = 80.0;
 		}
 		
 		then decide decision1;
@@ -26,9 +24,10 @@ package DecisionExample {
 		action addCharge : AddCharge {
 			in charge = monitor.batteryCharge;
 		}
-		then continueCharging;
 		
 		action endCharging : EndCharging;
 		then done;
 	}
+	
+	action test : ChargeBattery;
 }

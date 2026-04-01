@@ -28,7 +28,6 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
         ArrayList<ISuccession> outgoingList = new ArrayList<>();
         
         for (Element elem : containerNamespace.getOwnedMember()) {
-
             // Caso 1: SuccessionAsUsage direto
             if (elem instanceof SuccessionAsUsage su) {
             	if (nodeElement.getElementId() != null) {
@@ -44,7 +43,6 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
                     }
             	}
             }
-
             // Caso 2: SuccessionAsUsage dentro de TransitionUsage
             if (elem instanceof TransitionUsage tu) {
             	if (nodeElement.getElementId() != null) {
@@ -65,7 +63,6 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
             	}
             }
         }
-
         this.incomings = incomingList;
         this.outgoings = outgoingList;
     }

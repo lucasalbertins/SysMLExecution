@@ -48,7 +48,9 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         for (ISuccession succession : configuration.successions) {
             INode target = succession.getTarget();
             if (target == null) continue;
-            if (!enabledActions.containsKey(target.getID()) && allIncomingsActive(target, configuration)) {
+            
+            // Troquei allIncomingsActive por isNodeEnabled, que analisa MergeNode
+            if (!enabledActions.containsKey(target.getID()) && isNodeEnabled(target, configuration)) {
                 System.out.println("[!] Nó " + target.getDeclaredName() + " habilitado para execução!");
                 enabledActions.put(target.getID(), target);
             }
@@ -56,18 +58,31 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         return new ArrayList<>(enabledActions.values());
     }
 
-    private boolean allIncomingsActive(INode node, SysMLV2Configuration configuration) {
+    // NOVO MÉTODO: Trata AND e OR
+    private boolean isNodeEnabled(INode node, SysMLV2Configuration configuration) {
         if (node == null || node.getIncomings().isEmpty()) return true;
 
-        // Converte as successions ativas em um Set de IDs
         Set<String> activeIds = configuration.successions.stream()
                 .map(ISuccession::getID)
                 .collect(Collectors.toSet());
 
-        // Verifica se todos os IDs de entrada obrigatórios estão no Set de ativos
-        return node.getIncomings().stream()
-                .map(ISuccession::getID)
-                .allMatch(activeIds::contains);
+        // Verifica se é um MergeNode
+        boolean isMergeNode = false;
+        if (node instanceof ControlNodeAdapter) {
+            isMergeNode = ((ControlNodeAdapter) node).isMergeNode();
+        }
+
+        if (isMergeNode) {
+            // MERGE NODE: Basta UMA entrada estar com token
+            return node.getIncomings().stream()
+                    .map(ISuccession::getID)
+                    .anyMatch(activeIds::contains);
+        } else {
+            // ACTION NODE / JOIN NODE: TODAS as entradas precisam de token
+            return node.getIncomings().stream()
+                    .map(ISuccession::getID)
+                    .allMatch(activeIds::contains);
+        }
     }
 
     @Override

@@ -17,7 +17,7 @@ class ExpressionAdapterTest {
     @BeforeAll
     static void setup() {
         sysmlSpec = new SysMLV2Spec();
-        sysmlSpec.parseFile("UnitsExample.sysml");
+        sysmlSpec.parseFile("other/UnitsExample.sysml");
         rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
         assertNotNull(rootNamespace);
     }
@@ -25,7 +25,7 @@ class ExpressionAdapterTest {
     @Test
     @DisplayName("Test Literal Integer Expression")
     void testLiteralIntegerExpression() {
-        AttributeUsage mass = findAttributeUsage("mass");
+        AttributeUsage mass = getAttribute("mass");
         FeatureValue fv = getFeatureValue(mass);
         Expression expr = (Expression) fv.getOwnedMemberElement();
 
@@ -42,7 +42,7 @@ class ExpressionAdapterTest {
     @Test
     @DisplayName("Test Unit Extraction from Operator Expression")
     void testUnitExtractionFromOperatorExpression() {
-        AttributeUsage mass = findAttributeUsage("mass");
+        AttributeUsage mass = getAttribute("mass");
         FeatureValue fv = getFeatureValue(mass);
         Expression expr = (Expression) fv.getOwnedMemberElement();
 
@@ -59,18 +59,46 @@ class ExpressionAdapterTest {
 
     // --- Métodos auxiliares ---
 
-    private AttributeUsage findAttributeUsage(String name) {
-        for (Element e : rootNamespace.getOwnedMember()) {
-            if (e instanceof PartUsage && e.getDeclaredName().equals("vehicle1")) {
-                for (Element f : ((PartUsage) e).getOwnedMember()) {
-                    if (f instanceof AttributeUsage && name.equals(f.getDeclaredName())) {
-                        return (AttributeUsage) f;
-                    }
-                }
+//    private AttributeUsage findAttributeUsage(String name) {
+//        for (Element e : rootNamespace.getOwnedMember()) {
+//            if (e instanceof PartUsage && e.getDeclaredName().equals("vehicle1")) {
+//                for (Element f : ((PartUsage) e).getOwnedMember()) {
+//                    if (f instanceof AttributeUsage && name.equals(f.getDeclaredName())) {
+//                        return (AttributeUsage) f;
+//                    }
+//                }
+//            }
+//        }
+//        throw new IllegalArgumentException("Attribute " + name + " not found");
+//    }
+    private AttributeUsage getAttribute(String name) {
+        PartDefinition vehicle = findPartDefinition(rootNamespace, "Vehicle");
+        if (vehicle == null) {
+            throw new AssertionError("PartDefinition 'Vehicle' não encontrado no modelo.");
+        }
+
+        for (Element e : vehicle.getOwnedMember()) {
+            if (e instanceof AttributeUsage au && name.equals(au.getDeclaredName())) {
+                return au;
             }
         }
-        throw new IllegalArgumentException("Attribute " + name + " not found");
+
+        throw new AssertionError("Attribute '" + name + "' não encontrado no Vehicle.");
     }
+    
+    private PartDefinition findPartDefinition(Namespace root, String name) {
+        if (root instanceof PartDefinition pd && name.equals(pd.getDeclaredName())) {
+            return pd;
+        }
+        for (Element e : root.getOwnedMember()) {
+            if (e instanceof Namespace ns) {
+                PartDefinition found = findPartDefinition(ns, name);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
 
     private FeatureValue getFeatureValue(AttributeUsage attr) {
         return attr.getOwnedMembership().stream()

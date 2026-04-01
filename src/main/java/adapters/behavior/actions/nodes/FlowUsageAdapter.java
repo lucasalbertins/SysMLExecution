@@ -10,7 +10,6 @@ import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.utils.INamedElement;
 
 import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.PayloadFeature;
 
 public class FlowUsageAdapter extends NamedElementAdapter implements IFlow {

@@ -6,9 +6,8 @@ package MergeExample {
 	action def Focus { in item scene : Scene; out item image : Image; }
 	action def Shoot { in item image : Image; out item picture : Picture; }
 	action def Display { in item picture : Picture; }
-	action def TakePicture;
 	
-	action takePicture : TakePicture {
+	action def TakePicture {
 		first start;
 		
 		then merge continue;
@@ -38,4 +37,6 @@ package MergeExample {
 		}	
 		then continue;	
 	}
+	
+	action takePicture : TakePicture;
 }

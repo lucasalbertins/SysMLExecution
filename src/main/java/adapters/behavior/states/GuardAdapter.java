@@ -7,7 +7,7 @@ import interfaces.behavior.states.IGuard;
 import interfaces.structures.expressions.IExpression;
 
 public class GuardAdapter implements IGuard {
-    private final Expression guardExpression;
+    private Expression guardExpression;
 
     public GuardAdapter(Expression guardExpression) {
         this.guardExpression = guardExpression;
@@ -30,8 +30,8 @@ public class GuardAdapter implements IGuard {
     */
 
     @Override
-    public IExpression getExpression() {
-        return (IExpression) guardExpression;
+    public Expression getExpression() {
+        return guardExpression;
     }
 
 }

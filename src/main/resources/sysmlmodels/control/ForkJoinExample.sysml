@@ -39,4 +39,6 @@ package ForkJoinExample {
 		join joinNode;
 		then done;
 	}
+	
+	action brake : Brake;
 }

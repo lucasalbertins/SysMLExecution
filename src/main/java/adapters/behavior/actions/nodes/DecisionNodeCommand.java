@@ -3,7 +3,6 @@ package adapters.behavior.actions.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapters.behavior.actions.SuccessionAdapter;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
@@ -29,7 +28,6 @@ public class DecisionNodeCommand extends ActionNodeCommand {
             // 4. Adiciona como um possível futuro
             possibleNextStates.add(new SysMLV2Configuration(nextSuccessions));
         }
-
         return possibleNextStates; // Retorna estados
     }
 }

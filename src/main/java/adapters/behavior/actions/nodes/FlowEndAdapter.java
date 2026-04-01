@@ -6,8 +6,6 @@ import java.util.List;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FlowEnd;
 import org.omg.sysml.lang.sysml.ReferenceUsage;
-import org.omg.sysml.lang.sysml.Usage;
-
 import adapters.utils.NamedElementAdapter;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.utils.INamedElement;

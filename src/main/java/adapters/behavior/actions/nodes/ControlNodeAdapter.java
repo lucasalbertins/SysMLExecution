@@ -22,9 +22,7 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	        	
 	            // Initial / Final via Succession
 	            if (element instanceof SuccessionAsUsage su) {
-
 	                if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
-	                	SuccessionAsUsage s = ((SuccessionAsUsage)element);
 	                	super.outgoings.add(AdapterUtils.setSuccession(su, "source", this));
 	                }
 
@@ -37,14 +35,10 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	        	
 	            // Initial / Final via Succession
 	            if (element instanceof SuccessionAsUsage su) {
-
 	                if ("done".equals(su.getTarget().getFirst().getDeclaredName())) {
-	                	SuccessionAsUsage s = ((SuccessionAsUsage)element);
 	                	super.incomings.add(AdapterUtils.setSuccession(su, "target", this));
 	                }
-
 	            }
-
 			}
 		}
 	}
