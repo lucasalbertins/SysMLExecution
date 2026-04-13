@@ -7,14 +7,17 @@ import org.omg.sysml.lang.sysml.ForkNode;
 import org.omg.sysml.lang.sysml.JoinNode;
 import org.omg.sysml.lang.sysml.MergeNode;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
+import org.omg.sysml.lang.sysml.TransitionUsage;
 
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeAdapter;
+import adapters.behavior.states.GuardAdapter;
 import adapters.utils.FinalNode;
 import adapters.utils.InitialNode;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.behavior.states.IGuard;
+
 
 public class SuccessionAdapter implements ISuccession {
 
@@ -38,7 +41,7 @@ public class SuccessionAdapter implements ISuccession {
                 return new ControlNodeAdapter(src);
             }
             
-            // Padrão: Se for um ActionUsage genérico ou não mapeado
+            // Padrão: Se for um ActionUsage genérico
             return new NodeAdapter(src);
         }
         return null;
@@ -58,7 +61,7 @@ public class SuccessionAdapter implements ISuccession {
                 return new ControlNodeAdapter(tgt);
             }
             
-            // Padrão: Se for um ActionUsage genérico ou não mapeado
+            // Padrão: Se for um ActionUsage genérico
             return new NodeAdapter(tgt);
         }
         return null;
@@ -66,12 +69,22 @@ public class SuccessionAdapter implements ISuccession {
 
     @Override
     public IGuard getGuard() {
-        for (Element guard : succession.getMember()) {
-            if (guard instanceof Expression e) { 
-                return (IGuard) e;
-            }
-        } 
-        return null;
+	     // 1. Direto
+	     for (Element guard : succession.getMember()) {
+	         if (guard instanceof Expression e) { 
+	             return new GuardAdapter(e);
+	         }
+	     } 
+	     
+	     // 2. TransitionUsage
+	     if (succession.getOwner() instanceof TransitionUsage tu) {
+	         for (Element member : tu.getMember()) {
+	             if (member instanceof Expression e) {
+	                 return new GuardAdapter(e);
+	             }
+	         }
+	     }
+	     return null;
     }
 
     @Override

@@ -260,11 +260,6 @@ class EvaluationUtilTest {
     	
     	if (element instanceof Namespace ns) {
     		for (Element child : ns.getOwnedMember()) {
-    			if (child instanceof OperatorExpressionImpl oei)  {
-    				System.out.println(oei);
-    				Element elet = registry.getByDeclaredName("monitor").getFirst().getElement();
-    				System.out.println(oei.checkCondition(ns));
-    			}
     			printElementStructure(child, indent + 1);
     		}
     	}
