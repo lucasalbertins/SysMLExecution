@@ -1,47 +1,52 @@
 package adapters.behavior.actions;
 
+import org.eclipse.emf.common.util.EList;
+import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.DecisionNode;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Expression;
 import org.omg.sysml.lang.sysml.ForkNode;
 import org.omg.sysml.lang.sysml.JoinNode;
+import org.omg.sysml.lang.sysml.LiteralBoolean;
 import org.omg.sysml.lang.sysml.MergeNode;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.TransitionUsage;
+import org.omg.sysml.util.EvaluationUtil;
 
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeAdapter;
-import adapters.behavior.states.GuardAdapter;
-import adapters.utils.FinalNode;
-import adapters.utils.InitialNode;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
-import interfaces.behavior.states.IGuard;
-
 
 public class SuccessionAdapter implements ISuccession {
 
     private SuccessionAsUsage succession;
+    private Element executionContext; // O contexto real da simulação
     
     public SuccessionAdapter(SuccessionAsUsage succession) {
         this.succession = succession;
     }
 
+    // Injeção de dependência para receber o contexto dinâmico do simulador
+    public void setExecutionContext(Element executionContext) {
+        this.executionContext = executionContext;
+    }
+
     @Override
     public INode getSource() {
         for (Element src : succession.getSource()) {
-        	// Se for um nó de controle do SysML ou nossos nós sintéticos
             if (src instanceof DecisionNode || 
                 src instanceof MergeNode || 
                 src instanceof ForkNode || 
-                src instanceof JoinNode ||
-                src instanceof InitialNode || 
-                src instanceof FinalNode) {
+                src instanceof JoinNode) {
                 
                 return new ControlNodeAdapter(src);
             }
+            if (src.getDeclaredName().equals("start") ||
+                src.getDeclaredName().equals("done")) {
+                return new ControlNodeAdapter(src);
+            }
             
-            // Padrão: Se for um ActionUsage genérico
             return new NodeAdapter(src);
         }
         return null;
@@ -50,41 +55,75 @@ public class SuccessionAdapter implements ISuccession {
     @Override
     public INode getTarget() {
         for (Element tgt : succession.getTarget()) {
-        	// Se for um nó de controle ou nossos nós sintéticos
             if (tgt instanceof DecisionNode || 
                 tgt instanceof MergeNode || 
                 tgt instanceof ForkNode || 
-                tgt instanceof JoinNode ||
-                tgt instanceof InitialNode || 
-                tgt instanceof FinalNode) {
+                tgt instanceof JoinNode) {
                 
                 return new ControlNodeAdapter(tgt);
             }
+            if (tgt.getDeclaredName().equals("start") ||
+                tgt.getDeclaredName().equals("done")) {
+                return new ControlNodeAdapter(tgt);
+            }
             
-            // Padrão: Se for um ActionUsage genérico
             return new NodeAdapter(tgt);
         }
         return null;
     }
 
-    @Override
-    public IGuard getGuard() {
-	     // 1. Direto
-	     for (Element guard : succession.getMember()) {
-	         if (guard instanceof Expression e) { 
-	             return new GuardAdapter(e);
-	         }
-	     } 
-	     
-	     // 2. TransitionUsage
-	     if (succession.getOwner() instanceof TransitionUsage tu) {
-	         for (Element member : tu.getMember()) {
-	             if (member instanceof Expression e) {
-	                 return new GuardAdapter(e);
-	             }
-	         }
-	     }
-	     return null;
+    // Avalia a guarda de forma autônoma
+    public boolean evaluateGuard() {
+        Expression guardExpr = extractGuardExpression();
+
+        if (guardExpr == null) {
+            return true; // Transição sem guarda
+        }
+
+        Element contextToUse = (this.executionContext != null) ? this.executionContext : resolveContext();
+        EList<Element> result = EvaluationUtil.evaluate(guardExpr, contextToUse);
+
+        if (result != null && !result.isEmpty()) {
+            Element resElement = result.get(0);
+            if (resElement instanceof LiteralBoolean lb) {
+                return lb.isValue();
+            }
+        }
+
+        return false;
+    }
+    
+    private Expression extractGuardExpression() {
+        for (Element member : succession.getMember()) {
+            if (member instanceof Expression e) return e;
+        } 
+        if (succession.getOwner() instanceof TransitionUsage tu) {
+            for (Element member : tu.getMember()) {
+                if (member instanceof Expression e) return e;
+            }
+        }
+        return null;
+   }
+
+    public Element resolveContext() {
+        Element current = succession.getOwner();
+        
+        while (current != null) {
+            if (current instanceof ActionUsage && !(current instanceof TransitionUsage)) {
+                return current;
+            }
+            current = current.getOwner();
+        }
+        
+        return succession.getOwningNamespace(); 
+    }
+    
+
+    public void setExecutionContext(ActionUsageAdapter contextAdapter) {
+        if (contextAdapter != null) {
+            // Usa o método herdado do NodeAdapter para pegar o elemento físico
+            this.executionContext = contextAdapter.getElement();
+        }
     }
 
     @Override
@@ -103,12 +142,8 @@ public class SuccessionAdapter implements ISuccession {
     }
 
     @Override
-    public void setSource(INode source) {
-        
-    }
+    public void setSource(INode source) {}
 
     @Override
-    public void setTarget(INode target) {
-        
-    }
+    public void setTarget(INode target) {}
 }

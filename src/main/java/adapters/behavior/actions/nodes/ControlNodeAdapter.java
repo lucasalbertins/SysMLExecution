@@ -43,6 +43,7 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 		}
 	}
 
+	
 	@Override
 	public boolean isDecisionNode() {
 		return nodeElement instanceof DecisionNode;
@@ -65,11 +66,13 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 
 	@Override
 	public boolean isInitialNode() {
-		return nodeElement instanceof InitialNode;
+		//return nodeElement instanceof InitialNode;
+		return nodeElement.getDeclaredName().equals("start");
 	}
 
 	@Override
 	public boolean isFinalNode() {
-		return nodeElement instanceof FinalNode;
+		//return nodeElement instanceof FinalNode;
+		return nodeElement.getDeclaredName().equals("done");
 	}
 }

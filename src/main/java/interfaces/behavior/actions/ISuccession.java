@@ -10,8 +10,6 @@ public interface ISuccession extends INamedElement {
 	public INode getTarget();
 
 	public INode getSource();
-
-	public IGuard getGuard();
 	
 	void setSource(INode source);
 	

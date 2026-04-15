@@ -16,6 +16,9 @@ public class NodeCommandFactory {
                 return new MergeNodeCommand();
             if (controlNode.isDecisionNode())
                 return new DecisionNodeCommand();
+            if (controlNode.isFinalNode()) {
+            	return new FinalNodeCommand();
+            }
         }
         return new ActionNodeCommand(); 
     }

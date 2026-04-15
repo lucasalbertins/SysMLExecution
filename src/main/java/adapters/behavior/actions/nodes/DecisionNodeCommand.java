@@ -3,12 +3,11 @@ package adapters.behavior.actions.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapters.structures.expressions.ExpressionEvaluatorAdapter;
+import adapters.behavior.actions.SuccessionAdapter;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
-import interfaces.behavior.states.IGuard;
 
 public class DecisionNodeCommand extends ActionNodeCommand {
 
@@ -18,12 +17,14 @@ public class DecisionNodeCommand extends ActionNodeCommand {
 
         for (ISuccession outgoing : node.getOutgoings()) {
             
-            // 1. Analisa a guarda antes de criar o caminho
-            IGuard guard = outgoing.getGuard();
-            boolean isConditionMet = ExpressionEvaluatorAdapter.evaluate(guard, configuration);
+        	// 1. Analisa a guarda antes de criar o caminho
+            boolean isConditionMet = true;
+            if (outgoing instanceof SuccessionAdapter adapter) {
+                isConditionMet = adapter.evaluateGuard();
+            } 
 
             if (isConditionMet) {
-                // Caminho aprovado pela guarda (ou não possui guarda)
+            	// Caminho aprovado pela guarda (ou não possui guarda)
                 List<ISuccession> nextSuccessions = new ArrayList<>(configuration.successions);
                 List<IFlow> nextFlows = new ArrayList<>(configuration.flows);
                 
@@ -31,13 +32,13 @@ public class DecisionNodeCommand extends ActionNodeCommand {
                 removeIncomingFlows(node, nextFlows);
                 
                 nextSuccessions.add(outgoing);
-                System.out.printf("  [Decision] Caminho PERMITIDO. Produziu Succession: %s%n", outgoing.getID());
-                
                 addOutgoingFlows(node, nextFlows);
+                
+                System.out.printf("  [Decision] Caminho PERMITIDO. Produziu Succession: %s%n", outgoing.getID());
                 
                 possibleNextStates.add(new SysMLV2Configuration(nextSuccessions, nextFlows));
             } else {
-                // Caminho rejeitado
+            	// Caminho rejeitado
                 System.out.printf("  [Decision] Caminho BLOQUEADO pela guarda: %s%n", outgoing.getID());
             }
         }

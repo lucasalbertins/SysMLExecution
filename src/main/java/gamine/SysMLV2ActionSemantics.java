@@ -12,6 +12,7 @@ import adapters.behavior.actions.ActionUsageAdapter;
 import adapters.behavior.actions.SuccessionAdapter;
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeCommandFactory;
+import adapters.utils.AdapterUtils;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
@@ -26,6 +27,13 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
     public SysMLV2ActionSemantics(ActionUsageAdapter usage) {
         this.actionDefinition = new ActionDefinitionAdapter(usage.getActionDefinition());
+        if (AdapterUtils.successions != null) {
+            for (ISuccession succession : AdapterUtils.successions.values()) {
+                if (succession instanceof SuccessionAdapter sa) {
+                    sa.setExecutionContext(usage); 
+                }
+            }
+        }
     }
 
     @Override
@@ -48,7 +56,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         System.out.println("\n[Actions] Verificando actions disponíveis");
         Map<String, INode> enabledActions = new HashMap<>();
 
-        // 1. Verifica alvos a partir das Successions (Fluxo de Controle)
+        // 1. Verifica alvos a partir das Successions
         for (ISuccession succession : configuration.successions) {
             INode target = succession.getTarget();
             if (target == null) continue;
@@ -58,17 +66,15 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
                 enabledActions.put(target.getID(), target);
             }
         }
-        // 2. Verifica alvos a partir dos Flows (Fluxo de Dados/Objeto)
+        // 2. Verifica alvos a partir dos Flows
         for (IFlow flow : configuration.flows) {
             IFlowEnd targetEnd = flow.getTarget();
             if (targetEnd == null || targetEnd.getReferencedFeature() == null) continue;
 
-            // Busca o Nó correspondente usando a feature referenciada pelo FlowEnd
+            // Busca o nó correspondente usando a feature referenciada pelo FlowEnd
             INode targetNode = findNodeByFeature(targetEnd.getReferencedFeature());
             
             if (targetNode != null && !enabledActions.containsKey(targetNode.getID()) && isNodeEnabled(targetNode, configuration)) {
-                //String payloadName = flow.getPayload() != null ? flow.getPayload().getDeclaredName() : "N/A";
-                //System.out.println("  [!] Nó " + targetNode.getDeclaredName() + " habilitado por flow! Payload: " + payloadName);
                 enabledActions.put(targetNode.getID(), targetNode);
             }
         }
@@ -99,23 +105,23 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             isMergeNode = ((ControlNodeAdapter) node).isMergeNode();
         }
 
-        // Verifica Lógica de Succession (Controle)
+        // Verifica Lógica de Succession
         boolean hasIncomingSuccessions = !node.getIncomings().isEmpty();
         boolean successionsEnabled = true;
         if (hasIncomingSuccessions) {
             if (isMergeNode) {
-                // MERGE NODE: Basta UMA entrada estar com a succession
+            	// MERGE NODE: Basta UMA entrada estar com a succession
                 successionsEnabled = node.getIncomings().stream()
                         .map(ISuccession::getID)
                         .anyMatch(activeSuccIds::contains);
             } else {
-                // ACTION / JOIN NODE: TODAS as entradas precisam da succession
+            	// ACTION / JOIN NODE: TODAS as entradas precisam da succession
                 successionsEnabled = node.getIncomings().stream()
                         .map(ISuccession::getID)
                         .allMatch(activeSuccIds::contains);
             }
         }
-        // Lógica de Flow 
+        // Lógica de Flow 
         boolean flowsEnabled = true;
         if (!node.getIncomingFlows().isEmpty()) {
              Set<String> activeFlowIds = configuration.flows.stream().map(IFlow::getID).collect(Collectors.toSet());
@@ -130,12 +136,13 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             System.out.println("\n[Execute] Executando nó: " + node.getDeclaredName() + " via NodeCommandFactory");
             NodeCommandFactory.create(node).execute(node, configuration);
         }
+        // Retorna a própria estrutura usando o cálculo interno
         return List.of(calculateNextState(node, configuration));
     }
 
     private SysMLV2Configuration calculateNextState(INode node, SysMLV2Configuration current) {
         List<ISuccession> nextSuccessions = new ArrayList<>(current.successions);
-        List<IFlow> nextFlows = new ArrayList<>(current.flows); // Propaga os flows
+        List<IFlow> nextFlows = new ArrayList<>(current.flows); 
         
         // --- FASE DE CONSUMO ---
         // Consumo de Successions
@@ -143,12 +150,11 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             INode target = token.getTarget();
             return target != null && target.getID().equals(node.getID());
         });
-
         // Consumo de Flows
         nextFlows.removeIf(flow -> {
             IFlowEnd targetEnd = flow.getTarget();
             if (targetEnd != null && targetEnd.getReferencedFeature() != null) {
-                // Consome se a feature de destino deste flow é o Nó sendo executado
+            	// Consome se a feature de destino deste flow é o nó sendo executado
                 return targetEnd.getReferencedFeature().getID().equals(node.getID());
             }
             return false;
@@ -156,9 +162,17 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
         // --- FASE DE PRODUÇÃO ---
         if (node != null) {
-            // Produz Successions
+        	// Produz Successions
             for (ISuccession out : node.getOutgoings()) {
-                nextSuccessions.add((SuccessionAdapter) out);
+                // Checa a guarda aqui para respeitar o bloqueio da semântica principal
+                boolean conditionMet = true;
+                if (out instanceof SuccessionAdapter sa) {
+                    conditionMet = sa.evaluateGuard();
+                }
+                
+                if (conditionMet) {
+                    nextSuccessions.add(out);
+                }
             }
             // Produz Flows
             for (IFlow outFlow : node.getOutgoingFlows()) {

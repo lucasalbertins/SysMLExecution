@@ -22,9 +22,9 @@ public class DecisionNodeGamineTest {
     @BeforeAll
     static void init() {
         spec = new SysMLV2Spec();
-        spec.parseFile("control/DecisionExample.sysml");
+        spec.parseFile("control/NewDecisionNodeExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        System.out.println("DecisionExample.sysml loaded");
+        System.out.println("NewDecisionNodeExample.sysml loaded");
         assertNotNull(rootNamespace, "Namespace não deve ser nulo");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
         assertNotNull(registry, "Registry não deve ser nulo");
@@ -35,11 +35,10 @@ public class DecisionNodeGamineTest {
         ActionUsageAdapter usageAdapter = registry.getByDeclaredName(actionName).getFirst();
         return new SysMLV2ActionSemantics(usageAdapter);
     }
-    // TODO: Analisar a lógica de guardas.
 
     @Test
     void testDFS() {
-        var semantics = createSemantics("test");
+        var semantics = createSemantics("chargeBattery");
         var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
         var dfs = new DepthFirstTraversal<>(rootedGraph);
         var result = dfs.runAlone();
