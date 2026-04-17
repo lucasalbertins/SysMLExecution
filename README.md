@@ -5,7 +5,7 @@ This project contains examples and models based on **SysML v2**, integrated with
 ## 📂 Project Structure
 
 Below is the organization of the main directories:
-- `src/main/java/sysml` : Central location for SysML v2 model files.
+- `src/main/resources/sysmlmodels/` : Central location for SysML v2 model files.
 - `src/main/resources/application.properties` : Execution paths and configuration properties.
 - `pom.xml` : Dependency management using Maven.
 
