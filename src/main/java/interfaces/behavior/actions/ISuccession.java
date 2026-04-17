@@ -12,5 +12,5 @@ public interface ISuccession extends INamedElement {
 	void setSource(INode source);
 	
     void setTarget(INode target);
-	// Maybe a generic NamedElement (?)
+	// Maybe generic NamedElement (?)
 }
