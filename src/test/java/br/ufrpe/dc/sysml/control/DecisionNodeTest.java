@@ -24,6 +24,7 @@ import org.omg.sysml.lang.sysml.Expression; // expressao de guarda
 
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 
+// OUTDATED
 class DecisionNodeTest {
 	private static SysMLV2Spec sysmlSpec;
 	private static Namespace rootNamespace;

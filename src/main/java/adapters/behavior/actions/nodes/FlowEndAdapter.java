@@ -6,6 +6,7 @@ import java.util.List;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FlowEnd;
 import org.omg.sysml.lang.sysml.ReferenceUsage;
+
 import adapters.utils.NamedElementAdapter;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.utils.INamedElement;
@@ -18,15 +19,15 @@ public class FlowEndAdapter extends NamedElementAdapter implements IFlowEnd {
 
     public FlowEndAdapter(FlowEnd fe) {
         super(fe);
-        // navega as features de um FlowEnd (separado em ReferenceSubsetting e ReferenceUsage)
+        // Navigates the features of a FlowEnd (separated into ReferenceSubsetting and ReferenceUsage).
         List<INamedElement> chainingFeatureList = new ArrayList<>();
         
         Feature referenced = fe.getOwnedReferenceSubsetting().getReferencedFeature();
-        // possibilidade 1: ReferencedFeature
+        // Possibility 1: ReferencedFeature
         if (referenced.getDeclaredName() != null) {
             this.referencedFeature = new NamedElementAdapter(referenced);
         }
-        // possibilidade 2: ChainingFeature dentro de ReferencedFeature
+        // Possibility 2: ChainingFeature inside a ReferencedFeature
         for (Feature f : referenced.getChainingFeature()) {
             chainingFeatureList.add(new NamedElementAdapter(f));
         }
@@ -36,7 +37,6 @@ public class FlowEndAdapter extends NamedElementAdapter implements IFlowEnd {
                 this.referenceUsage = new NamedElementAdapter(f);
             }
         }
-
         this.chainingFeature = chainingFeatureList.toArray(new INamedElement[0]);
     }
     

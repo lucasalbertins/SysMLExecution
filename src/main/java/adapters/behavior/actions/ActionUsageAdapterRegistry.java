@@ -11,30 +11,31 @@ import org.omg.sysml.lang.sysml.impl.ActionUsageImpl;
 
 public class ActionUsageAdapterRegistry {
 
+	// TODO: Avoid the import of ActionUsageImpl (?)
     private final Map<String, ActionUsageAdapter> map = new HashMap<>();
 
     public ActionUsageAdapterRegistry(Namespace root) {
         collect(root);
     }
 
-    // Retorna de acordo com o elementId extraído de um adaptador via getElementId()
+    // Returns based on the elementId extracted from an adapter via getElementId().
     public ActionUsageAdapter getById(String id) {
         return map.get(id);
     }
 
-    // Retorna uma lista com todos os adaptadores com o mesmo nome declarado
+    // Returns a list of all adapters with the same declared name.
     public List<ActionUsageAdapter> getByDeclaredName(String name) {
         return map.values().stream()
                 .filter(a -> name.equals(a.getDeclaredName()))
                 .toList();
     }
 
-    // Retorna todas os adaptadores
+    // Returns all adapters.
     public Collection<ActionUsageAdapter> getAll() {
         return map.values();
     }
     
-    // Talvez desnecessário
+    // Returns based on the position assumed on the map. 
     public ActionUsageAdapter getByPosition(int index) {
         return map.values()
                   .stream()
@@ -42,16 +43,14 @@ public class ActionUsageAdapterRegistry {
                   .get(index);
     }
 
-    // Coleta as ActionDefinition presente no modelo sysml
+    // Collects the ActionUsage's present in the SysML model.
     private void collect(Element element) {
-
         if (element instanceof ActionUsageImpl ad) {
         	map.put(
                 ad.getElementId(),
                 new ActionUsageAdapter(ad)
             );
         }
-
         if (element instanceof Namespace ns) {
             for (Element member : ns.getOwnedMember()) {
                 collect(member);

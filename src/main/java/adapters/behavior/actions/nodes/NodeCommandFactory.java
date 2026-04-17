@@ -2,11 +2,11 @@ package adapters.behavior.actions.nodes;
 
 import interfaces.behavior.actions.nodes.IControlNode;
 import interfaces.behavior.actions.nodes.INode;
-import interfaces.behavior.actions.nodes.NodeCommand;
+import interfaces.behavior.actions.nodes.INodeCommand;
 
 public class NodeCommandFactory {
 
-    public static NodeCommand create(INode node) {
+    public static INodeCommand create(INode node) {
         if (node instanceof IControlNode controlNode) {
             if (controlNode.isJoinNode())
                 return new JoinNodeCommand();
@@ -16,9 +16,8 @@ public class NodeCommandFactory {
                 return new MergeNodeCommand();
             if (controlNode.isDecisionNode())
                 return new DecisionNodeCommand();
-            if (controlNode.isFinalNode()) {
+            if (controlNode.isFinalNode())
             	return new FinalNodeCommand();
-            }
         }
         return new ActionNodeCommand(); 
     }

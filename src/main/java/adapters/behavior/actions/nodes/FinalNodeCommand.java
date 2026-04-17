@@ -3,30 +3,30 @@ package adapters.behavior.actions.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
+
+import gamine.domain.SysMLV2Configuration;
 
 public class FinalNodeCommand extends ActionNodeCommand {
 
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
-        // 1. Cria cópias das listas de estado atuais
+        // 1. Creates copies of the current state lists.
         List<ISuccession> nextSuccessions = new ArrayList<>(configuration.successions);
         List<IFlow> nextFlows = new ArrayList<>(configuration.flows);
         
-        // 2. Consome os tokens de entrada (Controle e Dados/Objetos)
+        // 2. Consumes the input tokens (Control and Data/Objects).
         removeIncomings(node, nextSuccessions);
         removeIncomingFlows(node, nextFlows);
         
-        // 3. Log customizado para informar que o caminho morreu corretamente
+        // 3. Customized log to correctly report that the path died.
         String nodeName = node.getDeclaredName() != null ? node.getDeclaredName() : node.getID();
-        System.out.printf("  [Final] Nó '%s' alcançado. Caminho encerrado com sucesso!%n", nodeName);
+        System.out.printf("  [Final] Node '%s' reached. Journey completed successfully.!%n", nodeName);
+        // Avoid the usage of addOutgoings() or addOutgoingFlows().
         
-        // Evitar addOutgoings() e addOutgoingFlows()
-        
-        // 4. Retorna o estado sem os tokens que acabaram de ser consumidos
+        // 4. Returns the state without the tokens that have just been consumed.
         return List.of(new SysMLV2Configuration(nextSuccessions, nextFlows));
     }
 }

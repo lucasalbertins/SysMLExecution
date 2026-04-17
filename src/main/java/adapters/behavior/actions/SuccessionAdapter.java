@@ -21,13 +21,13 @@ import interfaces.behavior.actions.nodes.INode;
 public class SuccessionAdapter implements ISuccession {
 
     private SuccessionAsUsage succession;
-    private Element executionContext; // O contexto real da simulação
+    private Element executionContext; // The real context of the simulation.
     
     public SuccessionAdapter(SuccessionAsUsage succession) {
         this.succession = succession;
     }
 
-    // Injeção de dependência para receber o contexto dinâmico do simulador
+    // Dependency injection to receive the dynamic context of the simulator.
     public void setExecutionContext(Element executionContext) {
         this.executionContext = executionContext;
     }
@@ -39,14 +39,12 @@ public class SuccessionAdapter implements ISuccession {
                 src instanceof MergeNode || 
                 src instanceof ForkNode || 
                 src instanceof JoinNode) {
-                
                 return new ControlNodeAdapter(src);
             }
             if (src.getDeclaredName().equals("start") ||
                 src.getDeclaredName().equals("done")) {
                 return new ControlNodeAdapter(src);
             }
-            
             return new NodeAdapter(src);
         }
         return null;
@@ -59,27 +57,24 @@ public class SuccessionAdapter implements ISuccession {
                 tgt instanceof MergeNode || 
                 tgt instanceof ForkNode || 
                 tgt instanceof JoinNode) {
-                
                 return new ControlNodeAdapter(tgt);
             }
             if (tgt.getDeclaredName().equals("start") ||
                 tgt.getDeclaredName().equals("done")) {
                 return new ControlNodeAdapter(tgt);
             }
-            
             return new NodeAdapter(tgt);
         }
         return null;
     }
 
-    // Avalia a guarda de forma autônoma
+    // Evaluates the guard autonomously.
     public boolean evaluateGuard() {
         Expression guardExpr = extractGuardExpression();
-
         if (guardExpr == null) {
-            return true; // Transição sem guarda
+            return true; // Transition without a guard.
         }
-
+        
         Element contextToUse = (this.executionContext != null) ? this.executionContext : resolveContext();
         EList<Element> result = EvaluationUtil.evaluate(guardExpr, contextToUse);
 
@@ -89,7 +84,6 @@ public class SuccessionAdapter implements ISuccession {
                 return lb.isValue();
             }
         }
-
         return false;
     }
     
@@ -107,21 +101,18 @@ public class SuccessionAdapter implements ISuccession {
 
     public Element resolveContext() {
         Element current = succession.getOwner();
-        
         while (current != null) {
             if (current instanceof ActionUsage && !(current instanceof TransitionUsage)) {
                 return current;
             }
             current = current.getOwner();
         }
-        
         return succession.getOwningNamespace(); 
     }
     
-
     public void setExecutionContext(ActionUsageAdapter contextAdapter) {
         if (contextAdapter != null) {
-            // Usa o método herdado do NodeAdapter para pegar o elemento físico
+            // Uses the method inherited from NodeAdapter to retrieve the physical element.
             this.executionContext = contextAdapter.getElement();
         }
     }
@@ -142,8 +133,12 @@ public class SuccessionAdapter implements ISuccession {
     }
 
     @Override
-    public void setSource(INode source) {}
+    public void setSource(INode source) {
+    	
+    }
 
     @Override
-    public void setTarget(INode target) {}
+    public void setTarget(INode target) {
+    	
+    }
 }

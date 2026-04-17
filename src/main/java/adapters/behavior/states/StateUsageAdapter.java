@@ -12,6 +12,7 @@ import adapters.behavior.actions.AcceptActionAdapter;
 import interfaces.behavior.states.IStateUsage;
 import interfaces.behavior.states.ITransition;
 
+// OUTDATED
 public class StateUsageAdapter implements IStateUsage {
     private StateUsage stateUsage;
 

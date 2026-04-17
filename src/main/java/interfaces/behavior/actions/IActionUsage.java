@@ -17,15 +17,14 @@ public interface IActionUsage extends INode {
 	
 	public IFlow[] getFlows();
 	
-	public ActionDefinition getActionDefinition(); // receber quem definiu a Action Usage
+	// Receives who defined the ActionUsage.
+	public ActionDefinition getActionDefinition();
 
 	public IParameter[] getInputs();
 	
 	public IParameter[] getOutputs();
-	// public boolean isCallBehaviorAction();
-
-	// public boolean isSendSignalAction();
-
-	// public boolean isAcceptEventAction();
 	
+	//public boolean isCallBehaviorAction();
+	//public boolean isSendSignalAction();
+	//public boolean isAcceptEventAction();
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.omg.sysml.lang.sysml.FeatureChainExpression;
 
+// OUTDATED
 public class FeatureChainExpressionAdapter extends ExpressionAdapter {
     private final FeatureChainExpression chain;
 

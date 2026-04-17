@@ -30,22 +30,20 @@ public class SysMLV2Spec {
 
     public SysMLV2Spec(){
     	Properties properties = new Properties();
+    	
     	try {
 			properties.load(new FileReader("src/main/resources/application.properties"));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	
     	baseFilePath = properties.getProperty("app.baseFilePath");
         String systemLibPath = properties.getProperty("app.systemLibPath");
+        
         if (systemLibPath == null || systemLibPath.isEmpty()) {
-            throw new RuntimeException("Erro: A variável de ambiente SYSTEM_LIB_PATH não foi definida.");
+            throw new RuntimeException("Error: The environment variable SYSTEM_LIB_PATH has not been defined.");
         }
-
         sysml = SysMLInteractive.getInstance();
         sysml.setVerbose(false);
         sysml.loadLibrary(systemLibPath);
@@ -53,7 +51,7 @@ public class SysMLV2Spec {
     }
     
     public void parseFileWithTransform(String fileName) {
-        // Monta o caminho completo
+        // Builds the full path.
         String fullPath = baseFilePath + "/" + fileName;
 
         KerMLStandaloneSetup.doSetup();
@@ -61,65 +59,62 @@ public class SysMLV2Spec {
         
         SysMLPackage.eINSTANCE.eClass();
 
-        // cria um ResourceSet e carrega o resource
+        // Creates a ResourceSet and loads the resource.
         ResourceSet resourceSet = new ResourceSetImpl();
         Resource resource = resourceSet.getResource(URI.createFileURI(fullPath), true);
 
         EcoreUtil.resolveAll(resourceSet);
         ElementUtil.transformAll(resourceSet, true);
 
-        // extrai o Namespace raiz e guarda em memória
+        // Extracts the root namespace and stores it in memory.
         if (resource != null && !resource.getContents().isEmpty()) {
             Object root = resource.getContents().get(0);
             if (root instanceof Namespace) {
                 this.rootNamespace = (Namespace) root;
             } else {
-                throw new RuntimeException("Root element não é um Namespace");
+                throw new RuntimeException("Root element is not a Namespace.");
             }
         } else {
-            throw new RuntimeException("Falha ao carregar o recurso ou conteúdo vazio: " + fullPath);
+            throw new RuntimeException("Failed to load resource or empty content: " + fullPath);
         }
     }
-    
     
     public void parseFile(String fileName) {
 
         if (baseFilePath == null || baseFilePath.isEmpty()) {
-            throw new RuntimeException("Erro: A variável de ambiente BASE_FILE_PATH não foi definida.");
+            throw new RuntimeException("Error: The environment variable BASE_FILE_PATH has not been defined.");
         }
-
         String fullPath = baseFilePath + "/" + fileName;
         
         try {
             String fileContent = Files.readString(Path.of(fullPath), Charset.forName("UTF-8"));
             SysMLInteractiveResult result = sysml.process(fileContent);
-            System.out.println("Resultado do parser:");
+            System.out.println("Parser result:");
             System.out.println(result.toString());
+            
             if (result.hasErrors()) {
-                throw new RuntimeException("Erro ao processar o arquivo SysML: " + result.getException());
+                throw new RuntimeException("Error processing SysML file: " + result.getException());
             }
-
             Element root = result.getRootElement();
+            
             if (root instanceof Namespace) {
                 this.rootNamespace = (Namespace) root;
                 //EcoreUtil.resolveAll(this.rootNamespace);
                 //ElementUtil.transformAll(this.rootNamespace.eResource().getResourceSet(), true);
             }
-
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao ler o arquivo SysML: " + e.getMessage(), e);
+            throw new RuntimeException("Error reading SysML file: " + e.getMessage(), e);
         }
     }
-
 
     public void parseFromEnvFile() {
         String fileName = System.getenv("FILE_NAME");
 
         if (baseFilePath == null || baseFilePath.isEmpty()) {
-            throw new RuntimeException("Erro: A variável de ambiente BASE_FILE_PATH não foi definida.");
+            throw new RuntimeException("Error: The environment variable BASE_FILE_PATH has not been defined.");
         }
         if (fileName == null || fileName.isEmpty()) {
-            throw new RuntimeException("Erro: A variável de ambiente FILE_NAME não foi definida.");
+            throw new RuntimeException("Erro: The environment variable FILE_NAME has not been defined.");
         }
 
         String fullPath = baseFilePath + "/" + fileName;
@@ -129,22 +124,19 @@ public class SysMLV2Spec {
             SysMLInteractiveResult result = sysml.process(fileContent);
 
             if (result.hasErrors()) {
-                throw new RuntimeException("Erro ao processar o arquivo SysML: " + result.getException());
+                throw new RuntimeException("Error processing SysML file: " + result.getException());
             }
-
             Element root = result.getRootElement();
             if (root instanceof Namespace) {
                 this.rootNamespace = (Namespace) root;
-
+                
                 // Resolve referências e gera relações implícitas - método novo:
                 EcoreUtil.resolveAll(this.rootNamespace);
                 ElementUtil.transformAll(this.rootNamespace.eResource().getResourceSet(), true);
-                
-                
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao ler o arquivo SysML: " + e.getMessage(), e);
+            throw new RuntimeException("Error reading SysML file: " + e.getMessage(), e);
         }
     }
 

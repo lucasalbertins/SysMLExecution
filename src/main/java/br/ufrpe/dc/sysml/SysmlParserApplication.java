@@ -14,11 +14,10 @@ public class SysmlParserApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SysmlParserApplication.class, args);
 	}
+	
     @GetMapping("/hello")
     public String sayHello() {
-    System.out.println("In the Spring Boot 3.x app!");
-    
-    
-    return "Hello Updated Parser Spring World!";
+    	System.out.println("In the Spring Boot 3.x app!");
+    	return "Hello Updated Parser Spring World!";
     }
 }

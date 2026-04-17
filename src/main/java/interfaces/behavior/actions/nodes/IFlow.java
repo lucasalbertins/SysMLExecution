@@ -10,5 +10,4 @@ public interface IFlow extends INamedElement {
 
     // PayloadFeature
     public INamedElement getPayload();
-   
 }

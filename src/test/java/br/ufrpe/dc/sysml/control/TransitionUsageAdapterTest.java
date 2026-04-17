@@ -27,8 +27,9 @@ public class TransitionUsageAdapterTest extends SysMLInteractiveTest {
         spec = new SysMLV2Spec();
         spec.parseFile("control/NewDecisionNodeExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
+        assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "Registry cannot be null.");
     }
 
     // Utils
@@ -48,7 +49,7 @@ public class TransitionUsageAdapterTest extends SysMLInteractiveTest {
 	void test() {
 		List<TransitionUsage> transitionUsages = new ArrayList<>();
 		collectTransitionUsages(rootNamespace, transitionUsages);
-		assertFalse(transitionUsages.isEmpty(), "Nenhum TransitionUsage encontrado no modelo");
+		assertFalse(transitionUsages.isEmpty(), "No TransitionUsage found in the model.");
 
 		for (TransitionUsage transitionUsage : transitionUsages) {
 			TransitionUsageAdapter adapter = new TransitionUsageAdapter(transitionUsage);

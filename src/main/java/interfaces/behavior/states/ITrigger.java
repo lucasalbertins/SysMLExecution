@@ -3,13 +3,13 @@ package interfaces.behavior.states;
 import org.omg.sysml.lang.sysml.Expression;
 //import org.omg.sysml.lang.sysml.TriggerInvocationExpression;
 
-
+// OUTDATED
 public interface ITrigger {
-	public String getTriggerType(); //update later
+	
+	public String getTriggerType(); // TODO: Update later.
 	
 	public Expression getTriggerArgument();
 	
-	/** helper que retorna só o nome (p.ex. "s") */
+	// Helper that only returns the name (p.ex. "s").
 	public String getArgumentName();
-    
 }

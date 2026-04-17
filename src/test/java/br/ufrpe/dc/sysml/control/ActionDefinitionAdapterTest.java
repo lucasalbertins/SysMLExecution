@@ -10,18 +10,18 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.omg.sysml.lang.sysml.ActionDefinition;
-import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 
 import adapters.behavior.actions.ActionDefinitionAdapter;
 import adapters.behavior.actions.ActionDefinitionAdapterRegistry;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.utils.INamedElement;
 import interfaces.utils.IParameter;
+
+import br.ufrpe.dc.sysml.SysMLV2Spec;
 
 class ActionDefinitionAdapterTest {
 
@@ -34,28 +34,12 @@ class ActionDefinitionAdapterTest {
         spec = new SysMLV2Spec();
         spec.parseFile("control/ForkJoinExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace não deve ser nulo");
-        
+        assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionDefinitionAdapterRegistry(rootNamespace);
-        assertNotNull(registry, "Registry não deve ser nulo");
+        assertNotNull(registry, "Registry cannot be null.");
     }
-
-    // Utils
-//    private void collectAllActionDefinitions(Element elt, List<ActionDefinition> out) {
-//        if (elt == null) return;
-//
-//        if (elt instanceof ActionDefinition ad) {
-//            out.add(ad);
-//        }
-//
-//        if (elt instanceof Namespace ns) {
-//            for (Element member : ns.getOwnedMember()) {
-//                collectAllActionDefinitions(member, out);
-//            }
-//        }
-//    }
     
-    // Busca recursiva genérica por nome e tipo
+    // Generic recursive search by name and type.
     private static <T extends Element> Optional<T> findElementByNameRecursive(
             Element element, String name, Class<T> type) {
 
@@ -63,7 +47,6 @@ class ActionDefinitionAdapterTest {
                 && name.equals(element.getDeclaredName())) {
             return Optional.of(type.cast(element));
         }
-
         if (element instanceof Namespace ns) {
             for (Element child : ns.getOwnedMember()) {
                 Optional<T> result =
@@ -76,11 +59,10 @@ class ActionDefinitionAdapterTest {
         return Optional.empty();
     }
 
-    // Verifica semanticamente se existe parâmetro com nome e direção
+    // Semantically checks if a parameter with a name and direction exists.
     private boolean hasParameter(ActionDefinitionAdapter adapter,
                                  String paramName,
                                  String direction) {
-
         for (IParameter p : adapter.getParameters()) {
             if (paramName.equals(p.getDeclaredName())
                     && direction.equalsIgnoreCase(p.getDirection().toString())) {
@@ -103,49 +85,14 @@ class ActionDefinitionAdapterTest {
         return sb.toString();
     }
     
-//    private static ActionUsage findFirstActionUsage(Element element) {
-//
-//        if (element instanceof ActionUsage au) {
-//            return au;
-//        }
-//
-//        if (element instanceof Namespace ns) {
-//            for (Element member : ns.getOwnedMember()) {
-//                ActionUsage found = findFirstActionUsage(member);
-//                if (found != null) {
-//                    return found;
-//                }
-//            }
-//        }
-//
-//        return null;
-//    }
-
-    
-    // Tests-------------------------------------------------------------
+    // Tests
     @Test
     void testRegistry() {
-
-//        // 1. Encontra uma ActionUsage qualquer no modelo
-//        ActionUsage usage = findFirstActionUsage(rootNamespace);
-//        assertNotNull(usage, "ActionUsage não deveria ser nula");
-//        System.out.println(usage.getElementId());
-//
-//        // 2. Obtém a ActionDefinition associada à usage
-//        ActionDefinition definition = (ActionDefinition) usage.getActionDefinition().getFirst();
-//        assertNotNull(definition, "ActionUsage deve referenciar uma ActionDefinition");
-//        System.out.println(definition.getDeclaredName());
-//
-//        String definitionId = definition.getElementId();
-//        assertNotNull(definitionId, "ActionDefinition deve ter elementId");
-//        System.out.println(definitionId);
-        
         System.out.println(registry.getByDeclaredName("MonitorTraction").get(0).getID());
         for (INode node : registry.getByDeclaredName("Brake").get(0).getNodes()) {
         	System.out.println(node.getDeclaredName());
         }
         System.out.println();
-        
         for (ActionDefinitionAdapter ad : registry.getAll()) {
         	System.out.println(ad.getDeclaredName());
         	System.out.println(ad.getID());
@@ -164,22 +111,17 @@ class ActionDefinitionAdapterTest {
                     "ActionDefinition 'MonitorBrakePedal' não encontrada"));
 
         ActionDefinitionAdapter adapter = registry.getById(def.getElementId());
-
         assertEquals("MonitorBrakePedal",
                 adapter.getDeclaredName());
-
         assertEquals(1,
                 adapter.getParameters().length,
                 "MonitorBrakePedal deve ter exatamente 1 parâmetro");
-
         assertTrue(
                 hasParameter(adapter, "pressure", "out"),
                 "MonitorBrakePedal deve possuir parâmetro 'out pressure'");
-
         // Consistência estrutural
         assertTrue(adapter.getFlows().length == 0,
                 "MonitorBrakePedal não deve possuir flows");
-        
         assertTrue(adapter.getNodes().length == 0,
         		"MonitorBrakePedal não deve possuir nodes");
         
@@ -203,23 +145,17 @@ class ActionDefinitionAdapterTest {
                 new AssertionError(
                     "ActionDefinition 'MonitorTraction' não encontrada"));
 
-        //ActionDefinitionAdapter adapter = new ActionDefinitionAdapter(def);
         ActionDefinitionAdapter adapter = registry.getById(def.getElementId());
-
         assertEquals("MonitorTraction",
                 adapter.getDeclaredName());
-
         assertEquals(1,
                 adapter.getParameters().length,
                 "MonitorTraction deve ter exatamente 1 parâmetro");
-
         assertTrue(
                 hasParameter(adapter, "modFreq", "out"),
                 "MonitorTraction deve possuir parâmetro 'out modFreq'");
-
         assertTrue(adapter.getFlows().length == 0,
         		"MonitorTraction não deve possuir flows");
-        
         assertTrue(adapter.getNodes().length == 0,
         		"MonitorTraction não deve possuir nodes");
         
@@ -243,20 +179,15 @@ class ActionDefinitionAdapterTest {
                 new AssertionError(
                     "ActionDefinition 'Braking' não encontrada"));
 
-        //ActionDefinitionAdapter adapter = new ActionDefinitionAdapter(def);
         ActionDefinitionAdapter adapter = registry.getById(def.getElementId());
-
         assertEquals("Braking",
                 adapter.getDeclaredName());
-
         assertEquals(2,
                 adapter.getParameters().length,
                 "Braking deve possuir exatamente 2 parâmetros");
-
         assertTrue(
                 hasParameter(adapter, "brakePressure", "in"),
                 "Braking deve possuir parâmetro 'in brakePressure'");
-
         assertTrue(
                 hasParameter(adapter, "modulationFrequency", "in"),
                 "Braking deve possuir parâmetro 'in modulationFrequency'");
@@ -286,12 +217,9 @@ class ActionDefinitionAdapterTest {
                 new AssertionError(
                     "ActionDefinition 'Brake' não encontrada"));
 
-        //ActionDefinitionAdapter adapter = new ActionDefinitionAdapter(def);
         ActionDefinitionAdapter adapter = registry.getById(def.getElementId());
-
         assertEquals("Brake",
                 adapter.getDeclaredName());
-
         assertEquals(0,
                 adapter.getParameters().length,
                 "Brake deve possuir exatamente 0 parâmetros");
@@ -305,24 +233,15 @@ class ActionDefinitionAdapterTest {
         }
         assertTrue(adapter.getFlows().length == 2,
         		"Braking deve possuir 2 flows");
-
         assertTrue(adapter.getNodes().length == 8,
         		"Braking deve possuir 8 nodes");
     }
     
-    
     @Test
     void testActionDefinitionAdaptersStructureAndConsistency() {
-        //List<ActionDefinition> actionDefs = new ArrayList<>();
-        //collectAllActionDefinitions(rootNamespace, actionDefs);
-
         assertFalse(registry.getAll().isEmpty(), "Nenhuma ActionDefinition encontrada no modelo");
 
         for (ActionDefinitionAdapter adapter : registry.getAll()) {
-
-            //ActionDefinitionAdapter adapter = new ActionDefinitionAdapter(actionDef);
-        	//ActionDefinitionAdapter adapter = registry.getById(actionDef.getElementId());
-            
             // Nome
             assertNotNull(adapter.getDeclaredName(),
                     "ActionDefinitionAdapter deve ter nome declarado");
@@ -331,21 +250,19 @@ class ActionDefinitionAdapterTest {
             IParameter[] parameters = adapter.getParameters();
             assertNotNull(parameters,
                     "Array de parâmetros não deve ser nulo");
-
             for (IParameter parameter : parameters) {
                 assertNotNull(parameter.getDeclaredName(),
                         "Parâmetro não deve ter nome nulo");
-
                 assertNotNull(parameter.getDirection(),
                         "Parâmetro '" + parameter.getDeclaredName()
                         + "' deve possuir direção (in/out/inout)");
             }
-
+            
             // Nodes
             INode[] nodes = adapter.getNodes();
             assertNotNull(nodes,
                     "Array de nodes não deve ser nulo");
-
+            
             for (INode node : nodes) {
                 assertNotNull(node.getDeclaredName(),
                         "Node não deve ter nome nulo");
@@ -355,19 +272,15 @@ class ActionDefinitionAdapterTest {
             IFlow[] flows = adapter.getFlows();
             assertNotNull(flows,
                     "Array de flows não deve ser nulo");
-
             for (IFlow flow : flows) {
                 assertNotNull(flow.getDeclaredName(),
                         "Flow deve possuir nome declarado");
-
                 assertNotNull(flow.getSource(),
                         "Flow '" + flow.getDeclaredName()
                         + "' deve possuir source");
-
                 assertNotNull(flow.getTarget(),
                         "Flow '" + flow.getDeclaredName()
                         + "' deve possuir target");
-
                 // Validação estrutural do caminho
                 assertDoesNotThrow(() -> toPath(flow.getSource()),
                         "Falha ao montar path do source do flow");
@@ -386,18 +299,17 @@ class ActionDefinitionAdapterTest {
                 assertEquals("charge", p.getDeclaredName());
                 assertEquals("out", p.getDirection().toString().toLowerCase());
             }
-
+            
             // AddCharge
             if (adapter.getDeclaredName().equals("AddCharge")) {
                 IParameter[] params = adapter.getParameters();
                 assertEquals(1, params.length,
                         "AddCharge deve ter exatamente 1 parâmetro");
-
                 IParameter p = params[0];
                 assertEquals("charge", p.getDeclaredName());
                 assertEquals("in", p.getDirection().toString().toLowerCase());
             }
-
+            
             // EndCharging
             if (adapter.getDeclaredName().equals("EndCharging")) {
                 assertEquals(0, adapter.getParameters().length,
@@ -406,28 +318,21 @@ class ActionDefinitionAdapterTest {
 
             // ChargeBattery
             if (adapter.getDeclaredName().equals("ChargeBattery")) {
-
                 List<String> nodeNames = new ArrayList<>();
                 for (INode node : adapter.getNodes()) {
                     nodeNames.add(node.getDeclaredName());
                 }
-
                 assertTrue(nodeNames.contains("start"),
                         "ChargeBattery deve possuir node 'start'");
-
                 assertTrue(nodeNames.contains("continueCharging"),
                         "ChargeBattery deve possuir merge 'continueCharging'");
-
                 assertTrue(nodeNames.contains("decision1"),
                         "ChargeBattery deve possuir decision 'decision1'");
-
                 assertTrue(nodeNames.contains("done"),
                         "ChargeBattery deve possuir node 'done'");
             }
             
-            
             // Print
-            
             System.out.println("\n=== Testing ActionDefinitionAdapter for: " + adapter.getDeclaredName() + " ===");
     		System.out.println("Parameters:");
     		if (adapter.getParameters().length != 0) {
@@ -458,7 +363,6 @@ class ActionDefinitionAdapterTest {
     		} else {
     			System.out.println("<no-nodes>");
     		} 
-    		
         }
     }    
 }

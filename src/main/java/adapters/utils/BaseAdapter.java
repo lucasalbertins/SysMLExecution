@@ -1,8 +1,10 @@
 package adapters.utils;
 
 import org.omg.sysml.lang.sysml.Element;
+
 import interfaces.utils.IElement;
 
+// OUTDATED
 public abstract class BaseAdapter implements IElement {
 
     protected final Element element;

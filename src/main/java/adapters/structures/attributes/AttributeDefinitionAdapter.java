@@ -7,13 +7,11 @@ import org.omg.sysml.lang.sysml.AttributeUsage;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.AttributeDefinition;
 
-import interfaces.behavior.actions.IAttributeDefintion;
-import interfaces.structures.attributes.IAttributeUsage;
-import interfaces.utils.IFeature;
-import adapters.structures.attributes.AttributeUsageAdapter;
 import adapters.utils.GenericFeatureAdapter;
+import interfaces.structures.attributes.IAttributeDefinition;
+import interfaces.utils.IFeature;
 
-public class AttributeDefinitionAdapter implements IAttributeDefintion {
+public class AttributeDefinitionAdapter implements IAttributeDefinition {
 	  private final AttributeDefinition def;
 	  
 	  public AttributeDefinitionAdapter(AttributeDefinition def) {
@@ -82,4 +80,3 @@ public class AttributeDefinitionAdapter implements IAttributeDefintion {
 			return null;
 		}
 	}
-

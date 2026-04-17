@@ -1,4 +1,4 @@
-	package br.ufrpe.dc.sysml;
+package br.ufrpe.dc.sysml;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

@@ -3,6 +3,7 @@ package adapters.behavior.actions;
 //import org.eclipse.emf.common.util.EList;
 import org.omg.sysml.lang.sysml.AcceptActionUsage;
 
+// OUTDATED
 public class AcceptActionAdapter /* implements IAcceptAction*/ {
     private final AcceptActionUsage action;
 

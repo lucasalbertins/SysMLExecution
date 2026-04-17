@@ -13,12 +13,13 @@ import adapters.behavior.actions.SuccessionAdapter;
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeCommandFactory;
 import adapters.utils.AdapterUtils;
-import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.utils.INamedElement;
+
+import gamine.domain.SysMLV2Configuration;
 import obp3.runtime.sli.SemanticRelation;
 
 public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Configuration> {
@@ -38,13 +39,13 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
     @Override
     public List<SysMLV2Configuration> initial() {
-        System.out.println("\n[Initial] Buscando estado inicial");
+        System.out.println("\n[Initial] Searching initial state");
         List<ISuccession> initialSuccessions = new ArrayList<>();
         List<IFlow> initialFlows = new ArrayList<>();
         
         for (INode node: actionDefinition.getNodes()) {
             if (node instanceof ControlNodeAdapter && ((ControlNodeAdapter)node).isInitialNode() ) {
-                System.out.println("Succession inicial (source: start): " + node.getID());
+                System.out.println("Initial succession (source: start): " + node.getID());
                 initialSuccessions.addAll(node.getOutgoings());
             }
         }
@@ -53,36 +54,35 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
     @Override
     public List<INode> actions(SysMLV2Configuration configuration) {
-        System.out.println("\n[Actions] Verificando actions disponíveis");
+        System.out.println("\n[Actions] Checking available actions");
         Map<String, INode> enabledActions = new HashMap<>();
 
-        // 1. Verifica alvos a partir das Successions
+        // 1. Checks targets based on successions.
         for (ISuccession succession : configuration.successions) {
             INode target = succession.getTarget();
             if (target == null) continue;
             
             if (!enabledActions.containsKey(target.getID()) && isNodeEnabled(target, configuration)) {
-                System.out.println("  [!] Nó " + target.getDeclaredName() + " habilitado para execução!");
+                System.out.println("  [!] Node " + target.getDeclaredName() + " enabled for execution!");
                 enabledActions.put(target.getID(), target);
             }
         }
-        // 2. Verifica alvos a partir dos Flows
+        // 2. Checks targets based on flows.
         for (IFlow flow : configuration.flows) {
             IFlowEnd targetEnd = flow.getTarget();
             if (targetEnd == null || targetEnd.getReferencedFeature() == null) continue;
 
-            // Busca o nó correspondente usando a feature referenciada pelo FlowEnd
+            // Finds the corresponding node using the feature referenced by FlowEnd.
             INode targetNode = findNodeByFeature(targetEnd.getReferencedFeature());
             
             if (targetNode != null && !enabledActions.containsKey(targetNode.getID()) && isNodeEnabled(targetNode, configuration)) {
                 enabledActions.put(targetNode.getID(), targetNode);
             }
         }
-
         return new ArrayList<>(enabledActions.values());
     }
 
-    // Utilitário para mapear uma Feature (vinda de um IFlowEnd) de volta para um INode
+    // Utility to map a Feature (coming from an IFlowEnd) back to an INode.
     private INode findNodeByFeature(INamedElement feature) {
         for (INode node : actionDefinition.getNodes()) {
             if (node.getID().equals(feature.getID())) {
@@ -92,7 +92,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         return null;
     }
 
-    // Tratamento de AND (Join/Action) e OR (Merge)
+    // Treatment of AND (Action/Join) and OR (Merge)
     private boolean isNodeEnabled(INode node, SysMLV2Configuration configuration) {
         if (node == null) return true;
 
@@ -105,23 +105,23 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             isMergeNode = ((ControlNodeAdapter) node).isMergeNode();
         }
 
-        // Verifica Lógica de Succession
+        // Verifies succession logic.
         boolean hasIncomingSuccessions = !node.getIncomings().isEmpty();
         boolean successionsEnabled = true;
         if (hasIncomingSuccessions) {
             if (isMergeNode) {
-            	// MERGE NODE: Basta UMA entrada estar com a succession
+            	// MergeNode: Only ONE entry needs to have the succession.
                 successionsEnabled = node.getIncomings().stream()
                         .map(ISuccession::getID)
                         .anyMatch(activeSuccIds::contains);
             } else {
-            	// ACTION / JOIN NODE: TODAS as entradas precisam da succession
+            	// ActionNode/JoinNode: ALL entries need the succession.
                 successionsEnabled = node.getIncomings().stream()
                         .map(ISuccession::getID)
                         .allMatch(activeSuccIds::contains);
             }
         }
-        // Lógica de Flow 
+        // Verifies flow logic. 
         boolean flowsEnabled = true;
         if (!node.getIncomingFlows().isEmpty()) {
              Set<String> activeFlowIds = configuration.flows.stream().map(IFlow::getID).collect(Collectors.toSet());
@@ -133,10 +133,10 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
         if (node != null) {
-            System.out.println("\n[Execute] Executando nó: " + node.getDeclaredName() + " via NodeCommandFactory");
+            System.out.println("\n[Execute] Executing node: " + node.getDeclaredName() + " via NodeCommandFactory");
             NodeCommandFactory.create(node).execute(node, configuration);
         }
-        // Retorna a própria estrutura usando o cálculo interno
+        // Returns the structure itself using internal calculation.
         return List.of(calculateNextState(node, configuration));
     }
 
@@ -144,27 +144,27 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         List<ISuccession> nextSuccessions = new ArrayList<>(current.successions);
         List<IFlow> nextFlows = new ArrayList<>(current.flows); 
         
-        // --- FASE DE CONSUMO ---
-        // Consumo de Successions
+        // --- CONSUMPTION PHASE ---
+        // Consumption of successions.
         nextSuccessions.removeIf(token -> {
             INode target = token.getTarget();
             return target != null && target.getID().equals(node.getID());
         });
-        // Consumo de Flows
+        // Consumption of flows.
         nextFlows.removeIf(flow -> {
             IFlowEnd targetEnd = flow.getTarget();
             if (targetEnd != null && targetEnd.getReferencedFeature() != null) {
-            	// Consome se a feature de destino deste flow é o nó sendo executado
+            	// Consumes if the target feature of this flow is the node being executed.
                 return targetEnd.getReferencedFeature().getID().equals(node.getID());
             }
             return false;
         });
 
-        // --- FASE DE PRODUÇÃO ---
+        // --- PRODUCTION PHASE ---
         if (node != null) {
-        	// Produz Successions
+        	// Produces successions.
             for (ISuccession out : node.getOutgoings()) {
-                // Checa a guarda aqui para respeitar o bloqueio da semântica principal
+                // Checks the guard here to respect the main semantic block.
                 boolean conditionMet = true;
                 if (out instanceof SuccessionAdapter sa) {
                     conditionMet = sa.evaluateGuard();
@@ -174,7 +174,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
                     nextSuccessions.add(out);
                 }
             }
-            // Produz Flows
+            // Produces flows.
             for (IFlow outFlow : node.getOutgoingFlows()) {
                 nextFlows.add(outFlow);
             }

@@ -1,5 +1,7 @@
-
 package adapters.behavior.states;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.omg.sysml.lang.sysml.StateDefinition;
 import org.omg.sysml.lang.sysml.StateUsage;
@@ -8,9 +10,7 @@ import interfaces.behavior.states.IStateDefinition;
 import interfaces.behavior.states.IStateUsage;
 import interfaces.behavior.states.ITransition;
 
-import java.util.ArrayList;
-import java.util.List;
-
+// OUTDATED
 public class StateDefinitionAdapter implements IStateDefinition {
     private StateDefinition stateDefinition;
 

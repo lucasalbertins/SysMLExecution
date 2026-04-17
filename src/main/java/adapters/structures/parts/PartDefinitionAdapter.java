@@ -7,7 +7,6 @@ import org.omg.sysml.lang.sysml.PartDefinition;
 
 import interfaces.structures.parts.IPartDefinition;
 
-
 public class PartDefinitionAdapter implements IPartDefinition {
     private final PartDefinition def;
 
@@ -32,7 +31,6 @@ public class PartDefinitionAdapter implements IPartDefinition {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
     
     /*
     @Override

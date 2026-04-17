@@ -1,16 +1,15 @@
 package adapters.behavior.actions.nodes;
 
+import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FlowEnd;
 import org.omg.sysml.lang.sysml.FlowUsage;
+import org.omg.sysml.lang.sysml.PayloadFeature;
 
 import adapters.utils.NamedElementAdapter;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.utils.INamedElement;
-
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.PayloadFeature;
 
 public class FlowUsageAdapter extends NamedElementAdapter implements IFlow {
 	
@@ -20,14 +19,14 @@ public class FlowUsageAdapter extends NamedElementAdapter implements IFlow {
 
 	public FlowUsageAdapter(FlowUsage flow) {
         super(flow);
-        // navega features de uma FlowUsage (separado em PayloadFeature e FlowEnd)
+        // Navigates the features of a FlowUsage (separated into PayloadFeature and FlowEnd).
         for (Feature feat : flow.getOwnedFeature()) {
-        	// extrai o tipo do payload de cada FlowUsage
+        	// Extracts the payload type from each FlowUsage.
             if (feat instanceof PayloadFeature pf) {
                 Element payloadType = pf.getType().get(0);
                 this.payload = new NamedElementAdapter(payloadType);
             }
-            // extrai o source e target de cada FlowEnd
+            // Extracts the source and target of each FlowEnd.
             if (feat instanceof FlowEnd fe) {
                 if ("source".equals(fe.getFeatureTarget().getName())) {
                     this.source = new FlowEndAdapter(fe);

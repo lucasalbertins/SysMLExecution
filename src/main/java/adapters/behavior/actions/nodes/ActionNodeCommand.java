@@ -4,29 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapters.behavior.actions.SuccessionAdapter;
-import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
-import interfaces.behavior.actions.nodes.NodeCommand;
+import interfaces.behavior.actions.nodes.INodeCommand;
 
-public class ActionNodeCommand implements NodeCommand {
+import gamine.domain.SysMLV2Configuration;
+
+public class ActionNodeCommand implements INodeCommand {
     
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
-        // 1. Cria cópias alteráveis das successions e flows atuais
+    	// 1. Creates editable copies of the current successions and flows.
         List<ISuccession> nextSuccessions = new ArrayList<>(configuration.successions);
         List<IFlow> nextFlows = new ArrayList<>(configuration.flows);
         
-        // 2. Manipula a cópia de Successions (Fluxo de Controle)
+        // 2. Handles the copy of successions (Control Flow).
         removeIncomings(node, nextSuccessions);
         addOutgoings(node, nextSuccessions);
         
-        // 3. Manipula a cópia de Flows (Fluxo de Objetos/Dados)
+        // 3. Handles the copy of flows (Data/Object Flow).
         removeIncomingFlows(node, nextFlows);
         addOutgoingFlows(node, nextFlows);
         
-        // 4. Retorna o novo estado usando o construtor completo
+        // 4. Returns the new state using the full constructor.
         return List.of(new SysMLV2Configuration(nextSuccessions, nextFlows));
     }
 
@@ -34,12 +35,12 @@ public class ActionNodeCommand implements NodeCommand {
         if (node.getIncomings() == null) return;
         
         for (ISuccession incoming : node.getIncomings()) {
-            // Remove EXATAMENTE 1 succession por aresta de entrada
+        	// Removes EXACTLY 1 succession per incoming edge.
             for (int i = 0; i < nextSuccessions.size(); i++) {
                 if (nextSuccessions.get(i).getID().equals(incoming.getID())) {
-                    System.out.println("  [-] Consumido Succession: " + nextSuccessions.get(i).getID());
+                    System.out.println("  [-] Succession consumed: " + nextSuccessions.get(i).getID());
                     nextSuccessions.remove(i);
-                    break; // Interrompe para não consumir successions duplicados na mesma aresta
+                    break; // Interrupts to avoid consuming duplicate successions on the same edge.
                 }
             }
         }
@@ -50,12 +51,11 @@ public class ActionNodeCommand implements NodeCommand {
         
         for (ISuccession outgoing : node.getOutgoings()) {
             nextSuccessions.add((SuccessionAdapter) outgoing);
-            System.out.println("  [+] Produzido Succession: " + outgoing.getID());
+            System.out.println("  [+] Succession produced: " + outgoing.getID());
         }
     }
 
-    // --- MÉTODOS DE FLOWS ---
-
+    // --- FLOW METHODS ---
     protected void removeIncomingFlows(INode node, List<IFlow> nextFlows) {
         if (node.getIncomingFlows() == null) return;
         
@@ -63,7 +63,7 @@ public class ActionNodeCommand implements NodeCommand {
             for (int i = 0; i < nextFlows.size(); i++) {
                 if (nextFlows.get(i).getID().equals(incomingFlow.getID())) {
                     String payloadName = incomingFlow.getPayload() != null ? incomingFlow.getPayload().getDeclaredName() : "<no-payload>";
-                    System.out.printf("  [-] Consumido Flow %s: %s [Payload: %s]%n", 
+                    System.out.printf("  [-] Flow consumed %s: %s [Payload: %s]%n", 
                     		nextFlows.get(i).getDeclaredName(), 
                     		nextFlows.get(i).getID(), 
                             payloadName);
@@ -80,7 +80,7 @@ public class ActionNodeCommand implements NodeCommand {
         for (IFlow outgoingFlow : node.getOutgoingFlows()) {
             nextFlows.add(outgoingFlow);
             String payloadName = outgoingFlow.getPayload() != null ? outgoingFlow.getPayload().getDeclaredName() : "<no-payload>";
-            System.out.printf("  [+] Produzido Flow %s: %s [Payload: %s]%n", 
+            System.out.printf("  [+] Flow produced %s: %s [Payload: %s]%n", 
             		outgoingFlow.getDeclaredName(), 
             		outgoingFlow.getID(), 
                     payloadName);

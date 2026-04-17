@@ -1,7 +1,6 @@
 package adapters.utils;
 
 import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Namespace;
 
 import interfaces.utils.INamedElement;
 
@@ -27,9 +26,4 @@ public class NamedElementAdapter implements INamedElement {
 	public String getID() {
 		return namedElement.getElementId() != null ? namedElement.getElementId() : "<no-id>";
 	}
-	
-//	public String getQualifiedName() {
-//		return namedElement.getQualifiedName() != null ? namedElement.getQualifiedName() : "<no-qualified-name>";
-//	}
-
 }

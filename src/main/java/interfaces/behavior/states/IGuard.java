@@ -2,8 +2,10 @@ package interfaces.behavior.states;
 
 import org.omg.sysml.lang.sysml.Expression;
 
+// OUTDATED
 public interface IGuard {
 
-	public Expression getExpression(); // talvez retornar Expression e, com essa Expression, realizar o evaluate em actions() para avaliar a guarda
-
+	public Expression getExpression(); 
+	// Perhaps return an Expression and, using that Expression, 
+	// perform an evaluate in actions() to assess the guard.
 }

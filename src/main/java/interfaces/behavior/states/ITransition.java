@@ -1,16 +1,14 @@
 package interfaces.behavior.states;
 
-//import interfaces.actions.IActionUsage;
-
+// OUTDATED
 public interface ITransition {
 	public String getSourceName();
 	
     public String getTargetName();
     
-    public IGuard   getGuard();
+    public IGuard getGuard();
     
     public ITrigger getTrigger();
     
-    public IEffect  getEffect();
-    
+    public IEffect getEffect();
 }

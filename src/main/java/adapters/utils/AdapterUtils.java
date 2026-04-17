@@ -13,8 +13,8 @@ import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
 
 public class AdapterUtils {
-	public static enum FlowType { Succession_As_Usage, Flow_Usage }
 	
+	public static enum FlowType { Succession_As_Usage, Flow_Usage }
 	public static HashMap<String,ISuccession> successions = new HashMap<>();
 
 	public static FlowType flowType(SuccessionAdapter sa, List<String> searched) {
@@ -31,11 +31,9 @@ public class AdapterUtils {
 	
 	public static ISuccession setSuccession(SuccessionAsUsage succession, String direction, NodeAdapter nodeAdapter) {
 		if (!successions.containsKey(succession.getElementId())) {
-
 	        ISuccession newSuccession = new SuccessionAdapter(succession);
 	        successions.put(succession.getElementId(), newSuccession);
 	    }
-		
 		if (direction.equals("source")) {	
 			successions.get(succession.getElementId()).setSource(nodeAdapter);
 			return successions.get(succession.getElementId());

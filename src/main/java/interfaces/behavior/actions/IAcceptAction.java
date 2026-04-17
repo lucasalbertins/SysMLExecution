@@ -1,12 +1,13 @@
 package interfaces.behavior.actions;
 
+// OUTDATED
 public interface IAcceptAction {
-    // nome da action usage (ex: “TurnOn”)
+    // ActionUsage's name. (ex: "TurnOn")
 	public String getName();
 
-    // nome do payload (ex: “TurnOn”)
+    // Payload's name (ex: "TurnOn")
 	public String getPayloadName();
 
-    // nome do receptor, se houver (ex: “battery”)
+    // Recipient's name, if any (e.g., "battery")
 	public String getReceiverName();
 }

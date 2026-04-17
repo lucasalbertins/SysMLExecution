@@ -14,26 +14,23 @@ import interfaces.behavior.actions.nodes.IControlNode;
 
 public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	
+	// TODO: Properly connect synthetic nodes (Initial/Final) to natural ones.
 	public ControlNodeAdapter(Element controlNodeElement) {
 		super(controlNodeElement);
 		if (controlNodeElement instanceof InitialNode) {
 			Element owner = controlNodeElement.getOwner();
 			for (Element element : owner.getOwnedElement()) {
-	        	
-	            // Initial / Final via Succession
+	            // InitialNode via SuccessionAsUsage.
 	            if (element instanceof SuccessionAsUsage su) {
 	                if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
 	                	super.outgoings.add(AdapterUtils.setSuccession(su, "source", this));
 	                }
-
 	            }
-
 			}
 		} else if (controlNodeElement instanceof FinalNode) {
 			Element owner = controlNodeElement.getOwner();
 			for (Element element : owner.getOwnedElement()) {
-	        	
-	            // Initial / Final via Succession
+	            // FinalNode via SuccessionAsUsage.
 	            if (element instanceof SuccessionAsUsage su) {
 	                if ("done".equals(su.getTarget().getFirst().getDeclaredName())) {
 	                	super.incomings.add(AdapterUtils.setSuccession(su, "target", this));
@@ -43,7 +40,6 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 		}
 	}
 
-	
 	@Override
 	public boolean isDecisionNode() {
 		return nodeElement instanceof DecisionNode;
@@ -66,13 +62,13 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 
 	@Override
 	public boolean isInitialNode() {
-		//return nodeElement instanceof InitialNode;
+		// return nodeElement instanceof InitialNode;
 		return nodeElement.getDeclaredName().equals("start");
 	}
 
 	@Override
 	public boolean isFinalNode() {
-		//return nodeElement instanceof FinalNode;
+		// return nodeElement instanceof FinalNode;
 		return nodeElement.getDeclaredName().equals("done");
 	}
 }

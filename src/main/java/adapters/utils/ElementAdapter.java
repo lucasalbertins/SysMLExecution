@@ -12,17 +12,15 @@ public class ElementAdapter implements IElement {
 		this.element = element;
 	}
 	
-	//Pega o ID (UUID) do elemento
+	// Extracts the ID of the element.
 	@Override
 	public String getID() {
 	    try {
 	        return element.getElementId() != null
 	                ? element.getElementId()
 	                : "<no-id>";
-	        
 	    } catch (Exception e) {
 	        return "<error-getting-id>";
 	    }
 	}
-
 }

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.omg.sysml.interactive.SysMLInteractive;
 
+// OUTDATED
 public class ExpressionEvaluationTest extends SysMLInteractiveTest {
 
 	protected void assertElement(String message, String expected, String actual) {

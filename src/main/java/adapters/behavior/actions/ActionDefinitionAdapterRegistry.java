@@ -17,24 +17,24 @@ public class ActionDefinitionAdapterRegistry {
         collect(root);
     }
 
-    // Retorna de acordo com o elementId extraído de um adaptador via getElementId()
+    // Returns based on the elementId extracted from an adapter via getElementId().
     public ActionDefinitionAdapter getById(String id) {
         return map.get(id);
     }
 
-    // Retorna uma lista com todos os adaptadores com o mesmo nome declarado
+    // Returns a list of all adapters with the same declared name.
     public List<ActionDefinitionAdapter> getByDeclaredName(String name) {
         return map.values().stream()
                 .filter(a -> name.equals(a.getDeclaredName()))
                 .toList();
     }
 
-    // Retorna todas os adaptadores
+    // Returns all adapters.
     public Collection<ActionDefinitionAdapter> getAll() {
         return map.values();
     }
     
-    // Talvez desnecessário
+    // Returns based on the position assumed on the map.
     public ActionDefinitionAdapter getByPosition(int index) {
         return map.values()
                   .stream()
@@ -42,16 +42,14 @@ public class ActionDefinitionAdapterRegistry {
                   .get(index);
     }
 
-    // Coleta as ActionDefinition presente no modelo sysml
+    // Collects the ActionDefinition's present in the SysML model.
     private void collect(Element element) {
-
         if (element instanceof ActionDefinition ad) {
         	map.put(
                 ad.getElementId(),
                 new ActionDefinitionAdapter(ad)
             );
         }
-
         if (element instanceof Namespace ns) {
             for (Element member : ns.getOwnedMember()) {
                 collect(member);

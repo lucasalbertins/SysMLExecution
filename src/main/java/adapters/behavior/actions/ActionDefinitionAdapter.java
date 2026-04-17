@@ -30,6 +30,7 @@ public class ActionDefinitionAdapter extends NamedElementAdapter implements IAct
     private IFlow[] flows;
     private HashMap<String,String> owners;
 
+    // TODO: Analyze the usage of the owners variable.
     public ActionDefinitionAdapter(ActionDefinition actionDefinition) {
     	super(actionDefinition);
     	owners = new HashMap<>();
@@ -39,17 +40,14 @@ public class ActionDefinitionAdapter extends NamedElementAdapter implements IAct
         ArrayList<IFlow> flowList = new ArrayList<>();
     	
         for (Element element : actionDefinition.getOwnedMember()) {
-        	
-            // Initial / Final via Succession
+            // InitialNode/FinalNode via SuccessionAsUsage.
             if (element instanceof SuccessionAsUsage su) {
-
                 if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
                     InitialNode init = new InitialNode();
                     init.setDeclaredName("start");
                     init.setOwner(actionDefinition);
                     nodeList.add(new ControlNodeAdapter(init));
                 }
-
                 if ("done".equals(su.getTarget().getFirst().getDeclaredName())) {
                     FinalNode fin = new FinalNode();
                     fin.setDeclaredName("done");
@@ -57,40 +55,30 @@ public class ActionDefinitionAdapter extends NamedElementAdapter implements IAct
                     nodeList.add(new ControlNodeAdapter(fin));
                 }
             }
-
             // ControlNode
             else if (element instanceof ControlNode cn) {
                 nodeList.add(new ControlNodeAdapter(cn));
             }
-
             // FlowUsage
             else if (element instanceof FlowUsage fu) {
                 flowList.add(new FlowUsageAdapter(fu));
             }
-
-            // ActionUsage (exceto TransitionUsage)
+            // ActionUsage (except TransitionUsage).
             else if (element instanceof ActionUsage au && !(element instanceof TransitionUsage)) {
                 nodeList.add(new ActionUsageAdapter(au));
-                
                 
                 for (Feature f : au.getOwnedFeature()) {
                    if (f.getDirection() != null && f.getOwner() instanceof ActionUsage owner) {
                         owners.put(new ParameterAdapter(f).getID(), owner.getElementId());
                     }
                 }
-                
-                
             }
-            
-            // Parameters da ActionDefinition
+            // ActionDefinition parameters.
             else if (element instanceof Feature f && f.getDirection() != null) {
                 parameterList.add(new ParameterAdapter(f));
                 owners.put(new ParameterAdapter(f).getID(), actionDefinition.getElementId());
             }
-            
-           
         }
-        
         for (INode node : nodeList) {
         	if (node instanceof IParameter && owners.containsKey(node.getID())) {
         		for (INode possibleOwner : nodeList) {
@@ -98,14 +86,11 @@ public class ActionDefinitionAdapter extends NamedElementAdapter implements IAct
         				possibleOwner instanceof ActionUsageAdapter) {
         				IParameter param = (IParameter) node;
         				ActionUsageAdapter action = (ActionUsageAdapter) possibleOwner;
-        				
         				param.setActionDefinition((ActionUsage) action);
         			}
         		}
         	}
-        	
         }
-         
     	this.nodes = nodeList.toArray(new INode[0]);
         this.parameters = parameterList.toArray(new IParameter[0]);
         this.flows = flowList.toArray(new IFlow[0]);

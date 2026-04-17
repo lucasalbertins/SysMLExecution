@@ -6,6 +6,7 @@ import org.omg.sysml.lang.sysml.TriggerInvocationExpression;
 
 import interfaces.behavior.states.ITrigger;
 
+// OUTDATED
 public class TriggerAdapter implements ITrigger {
     private final TriggerInvocationExpression trigger;
 

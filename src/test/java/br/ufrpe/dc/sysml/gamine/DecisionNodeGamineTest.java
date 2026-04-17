@@ -10,8 +10,10 @@ import adapters.behavior.actions.ActionUsageAdapter;
 import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import gamine.SysMLV2ActionSemantics;
+import obp3.Sequencer;
 import obp3.sli.core.operators.SemanticRelation2RootedGraph;
 import obp3.traversal.dfs.DepthFirstTraversal;
+import obp3.sli.core.operators.ToDetermistic;
 
 public class DecisionNodeGamineTest {
 	
@@ -25,23 +27,36 @@ public class DecisionNodeGamineTest {
         spec.parseFile("control/NewDecisionNodeExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         System.out.println("NewDecisionNodeExample.sysml loaded");
-        assertNotNull(rootNamespace, "Namespace não deve ser nulo");
+        assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
-        assertNotNull(registry, "Registry não deve ser nulo");
+        assertNotNull(registry, "Registry cannot be null.");
     }
 
-    // Cria a semântica a partir de uma ActionUsage
+    // Creates a semantics from an ActionUsage.
     private SysMLV2ActionSemantics createSemantics(String actionName) {
         ActionUsageAdapter usageAdapter = registry.getByDeclaredName(actionName).getFirst();
         return new SysMLV2ActionSemantics(usageAdapter);
     }
 
+//    @Test
+//    void testDFS() {
+//        var semantics = createSemantics("chargeBattery");
+//        var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
+//        var dfs = new DepthFirstTraversal<>(rootedGraph);
+//        var result = dfs.runAlone();
+//        System.out.println(result);
+//    }
+    
     @Test
-    void testDFS() {
-        var semantics = createSemantics("chargeBattery");
-        var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
-        var dfs = new DepthFirstTraversal<>(rootedGraph);
-        var result = dfs.runAlone();
-        System.out.println(result);
+    void newTest() {
+    	var semantics = createSemantics("chargeBattery");
+        var deterministic = ToDetermistic.randomPolicy(semantics, System.nanoTime());
+        var sequencer = new Sequencer<>(deterministic);
+        int[] count = new int[]{10};
+
+        var result = sequencer.run(c -> {
+            System.out.println("---- " + c);
+            return count[0]-- <= 1;
+        });
     }
 }

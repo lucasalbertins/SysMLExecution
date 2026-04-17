@@ -13,6 +13,7 @@ import org.omg.sysml.lang.sysml.SendActionUsage;
 
 import interfaces.behavior.states.IEffect;
 
+// OUTDATED
 public class EffectAdapter implements IEffect {
     private final ActionUsage action;
 

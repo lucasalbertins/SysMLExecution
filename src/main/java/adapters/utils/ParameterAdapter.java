@@ -1,11 +1,10 @@
 package adapters.utils;
 
-import interfaces.utils.IParameter;
-
 import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FeatureDirectionKind;
-//import org.omg.sysml.lang.sysml.ReferenceUsage;
+
+import interfaces.utils.IParameter;
 
 public class ParameterAdapter implements IParameter {
 	
@@ -47,7 +46,6 @@ public class ParameterAdapter implements IParameter {
 	public FeatureDirectionKind getDirection() {
 		return parameter.getDirection();
 	}
-
 
 	@Override
 	public void setActionDefinition(ActionUsage actionUsage) {

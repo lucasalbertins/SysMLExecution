@@ -1,9 +1,6 @@
 package gamine.domain;
 
-import java.util.Objects;
-
-import org.omg.sysml.lang.sysml.Element;
-
+// UNUSED
 public class SysMLV2BehaviorAction {
-
+	
 }

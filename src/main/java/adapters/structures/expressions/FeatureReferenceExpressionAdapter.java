@@ -2,7 +2,8 @@ package adapters.structures.expressions;
 
 import org.omg.sysml.lang.sysml.*;
 
-class FeatureReferenceExpressionAdapter extends ExpressionAdapter {
+// OUTDATED
+public class FeatureReferenceExpressionAdapter extends ExpressionAdapter {
     private final FeatureReferenceExpression ref;
 
     FeatureReferenceExpressionAdapter(FeatureReferenceExpression ref) {
@@ -28,4 +29,3 @@ class FeatureReferenceExpressionAdapter extends ExpressionAdapter {
 		return null;
 	}
 }
-

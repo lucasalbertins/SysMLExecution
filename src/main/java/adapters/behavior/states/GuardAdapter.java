@@ -1,8 +1,10 @@
 package adapters.behavior.states;
 
 import org.omg.sysml.lang.sysml.Expression;
+
 import interfaces.behavior.states.IGuard;
 
+// OUTDATED
 public class GuardAdapter implements IGuard {
     private Expression expression;
 

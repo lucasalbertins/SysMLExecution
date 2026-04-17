@@ -29,15 +29,15 @@ public class SysMLV2Configuration {
         if (obj == null || getClass() != obj.getClass()) return false;
         SysMLV2Configuration other = (SysMLV2Configuration) obj;
         
-        // Verifica tamanho (nós ativos de controle e de objeto/dado)
+        // Checks size (active control and object/data nodes).
         if (this.successions.size() != other.successions.size()) return false;
         if (this.flows.size() != other.flows.size()) return false;
         
-        // Compara os IDs de Successions
+        // Compare the succession IDs
         List<String> thisSuccIds = this.successions.stream().map(s -> s.getID()).sorted().toList();
         List<String> otherSuccIds = other.successions.stream().map(s -> s.getID()).sorted().toList();
         
-        // Compara os IDs de Flows
+        // Compare the flow IDs.
         List<String> thisFlowIds = this.flows.stream().map(f -> f.getID()).sorted().toList();
         List<String> otherFlowIds = other.flows.stream().map(f -> f.getID()).sorted().toList();
         
@@ -65,8 +65,7 @@ public class SysMLV2Configuration {
     public void removeSuccession(String id) {
         successions.removeIf(s -> s.getID().equals(id));
     }
-
-    // Novo método para remoção de flows pelo ID
+    
     public void removeFlow(String id) {
         flows.removeIf(f -> f.getID().equals(id));
     }

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 
 import interfaces.structures.parts.IPartUsage;
-import interfaces.utils.IParameter;
 
 public class PartUsageAdapter implements IPartUsage {
     private final PartUsage usage;
@@ -82,6 +81,5 @@ public class PartUsageAdapter implements IPartUsage {
 	@Override
 	public void setActionDefinition(ActionUsage actionUsage) {
 		// TODO Auto-generated method stub
-		
 	}
 }

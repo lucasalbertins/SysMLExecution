@@ -9,6 +9,7 @@ import org.omg.sysml.lang.sysml.Namespace;
 import adapters.behavior.actions.ActionUsageAdapter;
 import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
+
 import gamine.SysMLV2ActionSemantics;
 import obp3.sli.core.operators.SemanticRelation2RootedGraph;
 import obp3.traversal.dfs.DepthFirstTraversal;
@@ -25,12 +26,12 @@ public class MergeNodeGamineTest {
         spec.parseFile("control/MergeExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         System.out.println("MergeExample.sysml loaded");
-        assertNotNull(rootNamespace, "Namespace não deve ser nulo");
+        assertNotNull(rootNamespace, "Namespace cannote be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
-        assertNotNull(registry, "Registry não deve ser nulo");
+        assertNotNull(registry, "Registry cannot be null.");
     }
 
-    // Cria a semântica a partir de uma ActionUsage
+    // Creates a semantics from an ActionUsage.
     private SysMLV2ActionSemantics createSemantics(String actionName) {
         ActionUsageAdapter usageAdapter = registry.getByDeclaredName(actionName).getFirst();
         return new SysMLV2ActionSemantics(usageAdapter);

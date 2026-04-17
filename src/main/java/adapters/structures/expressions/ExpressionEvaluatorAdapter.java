@@ -19,9 +19,9 @@ import org.omg.sysml.expressions.ExpressionEvaluator;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.states.IGuard;
 
+// OUTDATED
 public class ExpressionEvaluatorAdapter implements ExpressionEvaluator {
-
-    // Método principal chamado pelo seu DecisionNodeCommand
+    // Método principal chamado pelo DecisionNodeCommand
     public static boolean evaluate(IGuard guard, SysMLV2Configuration currentState) {
         if (guard == null || guard.getExpression() == null) {
             return true;
@@ -47,13 +47,11 @@ public class ExpressionEvaluatorAdapter implements ExpressionEvaluator {
                 System.out.println("    [!] A avaliação da guarda retornou uma lista vazia ou nula.");
                 return false;
             }
-
         } catch (Exception e) {
             System.out.println("    [!] Erro interno ao resolver a guarda: " + e.getMessage());
             return false; 
         }
     }
-
 
     @Override
     public EList<Element> evaluate(Expression expression, Element target) {

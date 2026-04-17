@@ -1,33 +1,23 @@
 package adapters.structures.expressions;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.omg.sysml.lang.sysml.Expression;
-import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
 import org.omg.sysml.lang.sysml.LiteralBoolean;
 import org.omg.sysml.lang.sysml.LiteralInteger;
 import org.omg.sysml.lang.sysml.LiteralString;
 import org.omg.sysml.lang.sysml.LiteralRational;
-import org.omg.sysml.lang.sysml.OperatorExpression;
-
 import adapters.utils.NamedElementAdapter;
 import interfaces.structures.expressions.IExpression;
 
 import org.omg.sysml.lang.sysml.FeatureChainExpression;
 import org.omg.sysml.lang.sysml.LiteralInfinity;
 
-
+// OUTDATED
 // adapter genérico
 public abstract class ExpressionAdapter extends NamedElementAdapter implements IExpression {
- protected final Expression expr;
- protected ExpressionAdapter(Expression expr) {
-	 super(expr);
-     this.expr = expr;
-     
-     
+	protected final Expression expr;
+	protected ExpressionAdapter(Expression expr) {
+		super(expr);
+		this.expr = expr;
  }
  
  @Override
@@ -49,21 +39,19 @@ public abstract class ExpressionAdapter extends NamedElementAdapter implements I
      }
      // implementar outros cases
      return new UnsupportedExpressionAdapter(expr);
- }
-
+     }
 }
-
 
 /** Fallback para expressões não suportadas ainda */
 class UnsupportedExpressionAdapter extends ExpressionAdapter {
- UnsupportedExpressionAdapter(Expression expr) {
-     super(expr);
- }
+	UnsupportedExpressionAdapter(Expression expr) {
+		super(expr);
+}
  
  @Override
- public String toString() {
-     return "UnsupportedExpression(" + getType() + ")";
- }
+public String toString() {
+	 return "UnsupportedExpression(" + getType() + ")";
+}
 
 @Override
 public String getType() {

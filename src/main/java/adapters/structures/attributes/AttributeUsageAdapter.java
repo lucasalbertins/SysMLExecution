@@ -2,19 +2,8 @@ package adapters.structures.attributes;
 
 import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.AttributeUsage;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FeatureDirectionKind;
-import org.omg.sysml.lang.sysml.FeatureValue;
-import org.omg.sysml.lang.sysml.OperatorExpression;
-
-import adapters.structures.expressions.ExpressionAdapter;
-
-import org.omg.sysml.lang.sysml.LiteralInteger;
-import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
-
 import interfaces.structures.attributes.IAttributeUsage;
-import interfaces.utils.IParameter;
 
 public class AttributeUsageAdapter implements IAttributeUsage {
     private final AttributeUsage usage;

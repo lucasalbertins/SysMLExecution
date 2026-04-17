@@ -43,8 +43,7 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
 		}
 		
 		for (Element element : actionUsage.getOwnedMember()) {
-			
-			// Initial / Final via Succession
+			// InitialNode/FinalNode via SuccessionAsUsage.
 			if (element instanceof SuccessionAsUsage su) {
 				if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
                     InitialNode init = new InitialNode();
@@ -52,7 +51,6 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
                     init.setOwner(actionDefinition);
                     nodeList.add(new ControlNodeAdapter(init));
                 }
-
                 if ("done".equals(su.getTarget().getFirst().getDeclaredName())) {
                     FinalNode fin = new FinalNode();
                     fin.setDeclaredName("done");
@@ -60,36 +58,30 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
                     nodeList.add(new ControlNodeAdapter(fin));
                 }
 			}
-			
-			// ActionUsage (exceto TransitionUsage)
+			// ActionUsage (except TransitionUsage).
             else if (element instanceof ActionUsage au && !(element instanceof TransitionUsage)) {
                 nodeList.add(new ActionUsageAdapter(au));
-                
             } 
-			
-			// Parameters da ActionUsage
+			// ActionUsage parameters.
             else if (element instanceof Feature f && f.getDirection() != null) {
                 parameterList.add(new ParameterAdapter(f));
             }
-			
         	// ControlNode
         	else if (element instanceof ControlNode cn) {
         		nodeList.add(new ControlNodeAdapter(cn));
         	} 
-			
         	// FlowUsage
         	else if (element instanceof FlowUsage fu) {
         		nodeList.add(new NodeAdapter(fu));
         		flowList.add(new FlowUsageAdapter(fu));
         	}
         }
-		
 		this.parameters = parameterList.toArray(new IParameter[0]);
 		this.nodes = nodeList.toArray(new INode[0]);
 		this.flows = flowList.toArray(new IFlow[0]);
 	}
 	
-	// Método auxiliar para separar inputs de outputs da lista de parâmetros
+	// Auxiliary method for separating inputs from outputs in the parameter list.
 	private IParameter[] extractByDirection(FeatureDirectionKind... dirs) {
 	    List<IParameter> result = new ArrayList<>();
 

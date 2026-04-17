@@ -96,7 +96,6 @@ public class FinalNode implements Element {
 	@Override
 	public void eSet(EStructuralFeature feature, Object newValue) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -108,7 +107,6 @@ public class FinalNode implements Element {
 	@Override
 	public void eUnset(EStructuralFeature feature) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -132,13 +130,11 @@ public class FinalNode implements Element {
 	@Override
 	public void eSetDeliver(boolean deliver) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void eNotify(Notification notification) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -279,73 +275,60 @@ public class FinalNode implements Element {
 	@Override
 	public void setDeclaredName(String arg0) {
 		this.declaredName = arg0;
-		
 	}
 
 	@Override
 	public void setDeclaredShortName(String arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setElementId(String arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setIsImpliedIncluded(boolean arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setIsLibraryElement(boolean arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setName(String arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setOwner(Element arg0) {
 		this.owner = arg0;
-		
 	}
 
 	@Override
 	public void setOwningMembership(OwningMembership arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setOwningNamespace(Namespace arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setOwningRelationship(Relationship arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setQualifiedName(String arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void setShortName(String arg0) {
 		// TODO Auto-generated method stub
-		
 	}
-	
 }

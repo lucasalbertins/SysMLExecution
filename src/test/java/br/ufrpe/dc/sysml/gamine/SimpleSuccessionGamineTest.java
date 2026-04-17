@@ -15,7 +15,7 @@ import obp3.sli.core.operators.SemanticRelation2RootedGraph;
 import obp3.sli.core.operators.ToDetermistic;
 import obp3.traversal.dfs.DepthFirstTraversal;
 
-class SysMLV2SemanticsTest {
+public class SimpleSuccessionGamineTest {
 
     private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
@@ -27,12 +27,12 @@ class SysMLV2SemanticsTest {
         spec.parseFile("behavior/SimpleSuccession.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         System.out.println("SimpleSuccession.sysml loaded");
-        assertNotNull(rootNamespace, "Namespace não deve ser nulo");
+        assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
-        assertNotNull(registry, "Registry não deve ser nulo");
+        assertNotNull(registry, "Registry cannot be null.");
     }
 
-    // Cria a semântica a partir de uma ActionUsage
+    // Creates a semantics from an ActionUsage.
     private SysMLV2ActionSemantics createSemantics(String actionName) {
         ActionUsageAdapter usageAdapter = registry.getByDeclaredName(actionName).getFirst();
         return new SysMLV2ActionSemantics(usageAdapter);

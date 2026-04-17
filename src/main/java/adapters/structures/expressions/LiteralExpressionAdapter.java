@@ -9,7 +9,8 @@ import org.omg.sysml.lang.sysml.LiteralString;
 
 import interfaces.structures.expressions.ILiteralExpression;
 
-//Adapter para LiteralExpressions (booleano, inteiro, real, string, infinito)
+// OUTDATED
+// Adapter para LiteralExpressions (booleano, inteiro, real, string, infinito)
 public class LiteralExpressionAdapter extends ExpressionAdapter implements ILiteralExpression {
 	 LiteralExpressionAdapter(Expression literal) {
 	     super(literal);

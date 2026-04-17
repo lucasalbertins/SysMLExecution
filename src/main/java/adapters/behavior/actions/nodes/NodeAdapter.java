@@ -18,11 +18,11 @@ import interfaces.behavior.actions.nodes.INode;
 
 public class NodeAdapter extends NamedElementAdapter implements INode {
 
-    protected Element nodeElement; // o nó em si
+    protected Element nodeElement; // The node itself.
     protected List<ISuccession> incomings;
     protected List<ISuccession> outgoings;
     
-    // Novas listas para suportar os Flows
+    // New lists to support FlowUsage.
     protected List<IFlow> incomingFlows;
     protected List<IFlow> outgoingFlows;
 
@@ -33,12 +33,11 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
         Namespace containerNamespace = (Namespace) nodeElement.getOwner();
         ArrayList<ISuccession> incomingList = new ArrayList<>();
         ArrayList<ISuccession> outgoingList = new ArrayList<>();
-        
         ArrayList<IFlow> incomingFlowList = new ArrayList<>();
         ArrayList<IFlow> outgoingFlowList = new ArrayList<>();
         
         for (Element elem : containerNamespace.getOwnedMember()) {
-            // Caso 1: SuccessionAsUsage direto
+            // Case 1: Direct SuccessionAsUsage
             if (elem instanceof SuccessionAsUsage su) {
                 if (nodeElement.getElementId() != null) {
                     for (Element tgt : su.getTarget()) {
@@ -53,7 +52,7 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
                     }
                 }
             }
-            // Caso 2: SuccessionAsUsage dentro de TransitionUsage
+            // Case 2: SuccessionAsUsage inside a TransitionUsage
             if (elem instanceof TransitionUsage tu) {
                 if (nodeElement.getElementId() != null) {
                     for (Element sub : tu.getOwnedMember()) {
@@ -72,22 +71,19 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
                     }
                 }
             }
-            
-            // Caso 3: FlowUsage (Fluxos de objetos/dados)
+            // Case 3: FlowUsage (Data/Object Flow)
             if (elem instanceof FlowUsage fu) {
                 if (nodeElement.getElementId() != null) {
-                    // Instanciamos o adaptador criado anteriormente
                     FlowUsageAdapter flowAdapter = new FlowUsageAdapter(fu);
                     
-                    // Verifica se este nó é o ALVO (Target) do Flow
+                    // Checks if this node is the target of the flow.
                     IFlowEnd targetEnd = flowAdapter.getTarget();
                     if (targetEnd != null && targetEnd.getReferencedFeature() != null) {
                         if (nodeElement.getElementId().equals(targetEnd.getReferencedFeature().getID())) {
                             incomingFlowList.add(flowAdapter);
                         }
                     }
-                    
-                    // Verifica se este nó é a ORIGEM (Source) do Flow
+                    // Checks if this node is the source of the flow.
                     IFlowEnd sourceEnd = flowAdapter.getSource();
                     if (sourceEnd != null && sourceEnd.getReferencedFeature() != null) {
                         if (nodeElement.getElementId().equals(sourceEnd.getReferencedFeature().getID())) {
@@ -97,7 +93,6 @@ public class NodeAdapter extends NamedElementAdapter implements INode {
                 }
             }
         }
-        
         this.incomings = incomingList;
         this.outgoings = outgoingList;
         this.incomingFlows = incomingFlowList;

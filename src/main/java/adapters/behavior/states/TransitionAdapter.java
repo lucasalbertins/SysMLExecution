@@ -1,6 +1,7 @@
 package adapters.behavior.states;
 
 import org.eclipse.emf.common.util.EList;
+
 import org.omg.sysml.lang.sysml.AcceptActionUsage;
 import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.Expression;
@@ -12,7 +13,9 @@ import interfaces.behavior.states.IGuard;
 import interfaces.behavior.states.ITransition;
 import interfaces.behavior.states.ITrigger;
 
+// OUTDATED
 public class TransitionAdapter implements ITransition {
+	
     private final TransitionUsage transition;
 
     public TransitionAdapter(TransitionUsage transition) {
@@ -38,7 +41,7 @@ public class TransitionAdapter implements ITransition {
 
     @Override
     public ITrigger getTrigger() {
-        // Aqui pegamos a AcceptActionUsage que é o “trigger” do transition
+        // Aqui pegamos a AcceptActionUsage que é o "trigger" do transition
         EList<AcceptActionUsage> acceptActions = transition.getTriggerAction();
         AcceptActionUsage acc = acceptActions.isEmpty() ? null : acceptActions.get(0);
         if (acc != null) {

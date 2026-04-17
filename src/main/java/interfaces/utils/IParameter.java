@@ -3,7 +3,7 @@ package interfaces.utils;
 import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.FeatureDirectionKind;
 
-// incorpora PartUsage, AttributeUsage e ItemUsage
+// Incorporates PartUsage, AttributeUsage and ItemUsage.
 public interface IParameter extends INamedElement {
 	
 	public boolean isInput();
@@ -12,6 +12,5 @@ public interface IParameter extends INamedElement {
 	
 	public FeatureDirectionKind getDirection();
 
-	public void setActionDefinition(ActionUsage actionUsage); // ou herdar de outra interface?
-	
+	public void setActionDefinition(ActionUsage actionUsage); // or inherit from another interface?
 }

@@ -7,6 +7,7 @@ import org.omg.sysml.lang.sysml.OperatorExpression;
 
 import interfaces.structures.expressions.IExpression;
 
+// OUTDATED
 public class OperatorExpressionAdapter extends ExpressionAdapter {
     private final OperatorExpression op;
 

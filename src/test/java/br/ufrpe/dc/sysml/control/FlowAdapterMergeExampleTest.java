@@ -21,6 +21,7 @@ import adapters.behavior.actions.nodes.FlowUsageAdapter;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 
+// OUTDATED
 public class FlowAdapterMergeExampleTest {
 
     @Test

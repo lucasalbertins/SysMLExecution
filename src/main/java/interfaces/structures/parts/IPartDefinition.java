@@ -2,18 +2,16 @@ package interfaces.structures.parts;
 
 import java.util.List;
 
-import interfaces.utils.IFeature;
-
 public interface IPartDefinition {
-    // Nome declarado da part definition
+	
+    // PartDefinition's declared name.
 	public String getName();
 	
-    // Retornas as features (subelementos) da definition
+    // Returns the features (sub-elements) of the definition.
 	public List<String> getOwnedFeatures();
 	
-    // PartUsages dentro da PartDefinition (internas)
+    // PartUsages within the PartDefinition (internal).
 	public List<String> getOwnedPartUsages();
 	
 	public String toString();
-    
 }

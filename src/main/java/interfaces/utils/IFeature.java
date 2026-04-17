@@ -1,10 +1,7 @@
 package interfaces.utils;
 
 public interface IFeature extends INamedElement {
-// IType getType();
-	
-    // IElement getOwningType();
-    
+
 	public boolean isReadOnly();
     
 	public boolean isOrdered();
@@ -12,10 +9,10 @@ public interface IFeature extends INamedElement {
 	public boolean isUnique();
     
 	public boolean isComposite();
+	
+	//IType getType();
+    //IElement getOwningType();
+	//public FeatureDirectionKind getDirection();
     
-    // Multiplicity?
-    
-    // Trazer getDirection para cá?
-    // FeatureDirectionKind
-    
+    // TODO: Analyze multiplicity (?)
 }
