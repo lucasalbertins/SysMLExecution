@@ -17,12 +17,12 @@ public class ExploreUUIDTest {
     @BeforeAll
     static void init() {
         sysmlSpec = new SysMLV2Spec();
-        sysmlSpec.parseFile("control/DecisionExample.sysml"); // ajuste o caminho conforme necessário
+        sysmlSpec.parseFile("control/DecisionExample.sysml");
         rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
         assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
     }
 
-    //Explora elementos recursivamente e imprimir o UUID
+    // Explores elements recursively and print the UUID.
     private void exploreElements(Element element, int indent) {
         String prefix = "  ".repeat(indent);
         String className = element.getClass().getSimpleName();
@@ -40,8 +40,8 @@ public class ExploreUUIDTest {
 
     @Test
     void testExploreAllElements() {
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
-        System.out.println("=== EXPLORANDO ELEMENTOS DO MODELO ===");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
+        System.out.println("=== EXPLORING ELEMENTS OF THE MODEL ===");
         exploreElements(rootNamespace, 0);
     }
 }

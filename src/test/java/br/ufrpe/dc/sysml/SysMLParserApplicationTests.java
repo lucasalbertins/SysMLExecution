@@ -3,8 +3,9 @@ package br.ufrpe.dc.sysml;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+// OUTDATED
 @SpringBootTest
-class SysmlParserApplicationTests {
+public class SysMLParserApplicationTests {
 
 	@Test
 	void contextLoads() {

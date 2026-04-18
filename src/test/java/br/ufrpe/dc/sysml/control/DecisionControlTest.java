@@ -10,14 +10,13 @@ import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
 import org.omg.sysml.lang.sysml.FlowEnd;
 import org.omg.sysml.lang.sysml.FlowUsage;
 import org.omg.sysml.lang.sysml.Namespace;
-import org.omg.sysml.lang.sysml.Redefinition;
 import org.omg.sysml.lang.sysml.ReferenceUsage;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.Usage;
 
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 
-class DecisionControlTest {
+public class DecisionControlTest {
 	private static SysMLV2Spec sysmlSpec;
 	private static Namespace rootNamespace;
 
@@ -26,10 +25,10 @@ class DecisionControlTest {
 		sysmlSpec = new SysMLV2Spec();
 		sysmlSpec.parseFile("control/FlowUsageExample.sysml");
 		rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
-		assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+		assertNotNull(rootNamespace, "The root namespace must not be null.");
 	}
 		
-	// Imprime recursivamente qualquer elemento
+	// Recursively prints any element.
 	private void printSimpleStructure(Element element, int indent) {
 	    String prefix = "  ".repeat(indent);
 
@@ -40,27 +39,25 @@ class DecisionControlTest {
 	            ? element.getName()
 	            : "Unnamed";
 
-	    // Imprime classe + nome
+	    // Prints class + name
 	    System.out.println(prefix + element.eClass().getName() + " - " + declared);
 
-	    // ==== Específico para FlowUsage ====
+	    // ==== FlowUsage ====
 	    if (element instanceof FlowUsage fu) {
 	        System.out.printf("%sFlowUsage: %s%n", prefix, declared);
-	        
 
-	        
 	        // 0) Inspect RelatedFeatures:
 	        inspectRelatedFeatures(fu, indent);
-	        // 1) Owned features: procurar payloads e imprimir info
+	        // 1) Owned features: search for payloads and print info.
 	        if (!fu.getOwnedFeature().isEmpty()) {
 	            for (Feature of : fu.getOwnedFeature()) {
 	                String ofClass = of.eClass().getName();
 	                String ofDeclared = of.getDeclaredName() != null ? of.getDeclaredName() : of.getName();
-	                // detecta payload pelo nome ou pela classe heurística
+	                // Detects payload by name or heuristic class.
 	                boolean isPayload = "payload".equalsIgnoreCase(ofDeclared) || ofClass.toLowerCase().contains("payload");
 	                if (isPayload) {
 	                    System.out.printf("%s  PayloadFeature - %s%n", prefix, ofDeclared);
-	                    // tenta imprimir tipo do payload (se houver getType())
+	                    // Attempts to print the payload type (if there's a getType()).
 	                    try {
 	                        var types = of.getType();
 	                        if (types != null && !types.isEmpty() && types.get(0) != null) {
@@ -80,12 +77,12 @@ class DecisionControlTest {
 	            for (Feature rel : fu.getRelatedFeature()) {
 	                String relCls = rel.eClass().getName();
 	                String relName = rel.getDeclaredName() != null ? rel.getDeclaredName() : rel.getName();
-	                // se for Usage, imprimir nome da usage
+	                // If it's a Usage, prints its name.
 	                if (rel instanceof Usage u) {
 	                    String uname = u.getDeclaredName() != null ? u.getDeclaredName() : u.getName();
 	                    System.out.printf("%s    relatedFeature: %s (%s)%n", prefix, uname, relCls);
 	                } else {
-	                    // tenta namingFeature se for FeatureReferenceExpression
+	                    // Attempts namingFeature if it's a FeatureReferenceExpression.
 	                    if (rel instanceof FeatureReferenceExpression fre) {
 	                        try {
 	                            String logical = fre.namingFeature().effectiveName();
@@ -102,7 +99,7 @@ class DecisionControlTest {
 	            System.out.printf("%s  Related Features: (none)%n", prefix);
 	        }
 
-	        // 3) FlowEnds detalhados (e seus ReferenceUsages)
+	        // 3) FlowEnds (and owned ReferenceUsages)
 	        if (fu.getFlowEnd() != null && !fu.getFlowEnd().isEmpty()) {
 	            for (FlowEnd fe : fu.getFlowEnd()) {
 	                String feName = fe.getDeclaredName() != null ? fe.getDeclaredName() : "<no-name>";
@@ -112,14 +109,14 @@ class DecisionControlTest {
 	                } catch (Exception ex) { /* ignore */ }
 	                System.out.printf("%s  FlowEnd - %s [dir=%s]%n", prefix, feName, dir);
 
-	                // ownedFeature dentro do FlowEnd (tipicamente ReferenceUsages)
+	                // ownedFeature inside the FlowEnd (usually ReferenceUsage's).
 	                if (!fe.getOwnedFeature().isEmpty()) {
 	                    for (Feature ffeat : fe.getOwnedFeature()) {
 	                        String fclass = ffeat.eClass().getName();
 	                        String fdecl = ffeat.getDeclaredName() != null ? ffeat.getDeclaredName() : (ffeat.getName() != null ? ffeat.getName() : "<no-name>");
 	                        System.out.printf("%s    Owned Feature: %s - %s%n", prefix, fclass, fdecl);
 
-	                        // Se ReferenceUsage -> imprimir owningUsage e procura ownedRedefinition
+	                        // IF ReferenceUsage -> print owningUsage e search ownedRedefinition.
 	                        if (ffeat instanceof ReferenceUsage ru) {
 	                            // OwningUsage (pode ser null)
 	                            Usage owning = ru.getOwningUsage();
@@ -139,10 +136,10 @@ class DecisionControlTest {
 	                                    }
 	                                }
 	                            } catch (Exception ex) {
-	                                // swallow - estrut. pode variar
+	                                // swallow - structure can vary.
 	                            }
 
-	                            // também tente chainingFeature / namingFeature para obter nome lógico
+	                            // Also try chainingFeature / namingFeature to get a logical name
 	                            try {
 	                                if (!ru.getChainingFeature().isEmpty()) {
 	                                    Feature chain = ru.getChainingFeature().get(0);
@@ -151,7 +148,7 @@ class DecisionControlTest {
 	                                            String logical = fr.namingFeature().effectiveName();
 	                                            System.out.printf("%s      chaining namingFeature: %s%n", prefix, logical);
 	                                        } catch (Exception ex) {
-	                                            // fallback para declaredName
+	                                            // fallback for declaredName
 	                                            System.out.printf("%s      chainingFeature: %s%n", prefix, chain.getDeclaredName());
 	                                        }
 	                                    } else {
@@ -163,7 +160,7 @@ class DecisionControlTest {
 	                            }
 	                        } // end ReferenceUsage handling
 	                        else {
-	                            // tenta namingFeature para features que forem FeatureReferenceExpression
+	                            // Attempts namingFeature for features that are FeatureReferenceExpression.
 	                            if (ffeat instanceof FeatureReferenceExpression fre2) {
 	                                try {
 	                                    String logical = fre2.namingFeature().effectiveName();
@@ -178,18 +175,18 @@ class DecisionControlTest {
 	            } // end for flowEnd
 	        } // end flowEnd processing
 
-	        // não recursar mais aqui; FlowUsage já analisado
+	        // Do not reject here anymore; FlowUsage already analyzed.
 	        return;
-	    } // fim FlowUsage handling
+	    } // end for FlowUsage handling
 
-	    // ==== Caso ReferenceUsage genérico (fora de FlowEnd) ====
+	    // ==== Generic ReferenceUsage (outside the FlowEnd) ====
 	    if (element instanceof ReferenceUsage ru) {
 	        Usage owning = ru.getOwningUsage();
 	        String ownName = owning != null ? (owning.getDeclaredName() != null ? owning.getDeclaredName() : owning.getName()) : "null";
 	        System.out.printf("%s  ReferenceUsage - OwningUsage: %s%n", prefix, ownName);
 
 	        if (!ru.getOwnedRedefinition().isEmpty()) {
-	            System.out.println(prefix + "    Existe uma OwnedRedefinition!");
+	            System.out.println(prefix + "    There is an OwnedRedefinition!");
 	            try {
 	                var red = ru.getOwnedRedefinition().get(0);
 	                var redefined = red.getRedefinedFeature();
@@ -201,7 +198,7 @@ class DecisionControlTest {
 	        }
 	    }
 
-	    // ==== Explora ownedFeatures se o elemento for Feature ====
+	    // ==== Explores ownedFeatures if the element is a Feature ====
 	    if (element instanceof Feature feature) {
 	        if (!feature.getOwnedFeature().isEmpty()) {
 	            System.out.printf(prefix + "Owned Features:%n");
@@ -211,7 +208,7 @@ class DecisionControlTest {
 	        }
 	    }
 
-	    // ==== Recurse em Namespace (por fim) ====
+	    // ==== Recurse in Namespace (finally) ====
 	    if (element instanceof Namespace ns) {
 	        for (Element child : ns.getOwnedMember()) {
 	            printSimpleStructure(child, indent + 1);
@@ -221,12 +218,12 @@ class DecisionControlTest {
 
 	@Test
 	void testPrintSimpleModelStructure() {
-	    assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+	    assertNotNull(rootNamespace, "The root namespace must not be null.");
 	    System.out.println("=== SIMPLE MODEL STRUCTURE ===");
 	    printSimpleStructure(rootNamespace, 0);
 	}
 	
-	// método de teste para as relatedFeatures de uma FlowUsage
+	// Test method for the relatedFeatures of a FlowUsage.
 	private void inspectRelatedFeatures(FlowUsage fu, int indent) {
 	    String prefix = "  ".repeat(indent);
 	    System.out.printf("%s[inspectRelatedFeatures] FlowUsage: %s%n",
@@ -326,14 +323,14 @@ class DecisionControlTest {
 			String succName = succ.getDeclaredName() != null ? succ.getDeclaredName() : "<no-name>";
 			System.out.printf("%s[SuccessionAsUsage] %s%n", prefix, succName);
 
-			// percorre flows diretos da succession
+			// Traverses direct flows of the succession
 			for (Element member : succ.getOwnedMember()) {
 				if (member instanceof FlowUsage flow) {
 					printFlowDetails(flow, indent + 1);
 				}
 			}
 		}
-		// recursão
+		// recursion
 		if (elt instanceof Namespace ns) {
 			for (Element child : ns.getOwnedMember()) {
 				exploreSuccessionFlows(child, indent);
@@ -351,7 +348,7 @@ class DecisionControlTest {
 		String flowName = flow.getDeclaredName() != null ? flow.getDeclaredName() : "<no-name>";
 		System.out.printf("%s[FlowUsage] %s%n", prefix, flowName);
 
-		// ReferenceUsages e FlowEnd em ownedFeature
+		// ReferenceUsages and FlowEnd inside ownedFeature
 		for (var feat : flow.getOwnedFeature()) {
 			if (feat instanceof FlowEnd fe) {
 				String feName = fe.getDeclaredName() != null ? fe.getDeclaredName() : "<no-name>";
@@ -382,7 +379,7 @@ class DecisionControlTest {
 				System.out.printf("%s    - ReferenceSubsetting QN: %s%n", prefix, qName);
 			}
 
-			// ReferenceUsages nas ownedFeature do FlowEnd
+			// ReferenceUsages in FlowEnd's ownedFeature.
 			for (var feat : end.getOwnedFeature()) {
 				if (feat instanceof ReferenceUsage ru2) {
 					String ru2Name = ru2.getDeclaredName() != null ? ru2.getDeclaredName() : "<no-name>";

@@ -25,13 +25,11 @@
 		<tag/>
 		<url/>
 	</scm>
-
 	<properties>
 		<java.version>23</java.version>
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
 		<sysml.version>0.56.0-SNAPSHOT</sysml.version> 
 	</properties>
-
 	<repositories>
     <repository>
         <id>github-sysml</id>
@@ -40,7 +38,6 @@
             <enabled>true</enabled>
         </snapshots>
     </repository>
-
 	<repository>
         <id>github-obp3</id>
         <url>https://maven.pkg.github.com/plug-obp/obp3-core</url>
@@ -48,10 +45,7 @@
             <enabled>true</enabled>
         </snapshots>
     </repository>
-	
-   
 </repositories>
-
 
 	<dependencies>
 		<dependency>
@@ -88,7 +82,6 @@
 		    <artifactId>junit-platform-suite</artifactId>
 		    <scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.eclipse.xtext</groupId>
 			<artifactId>org.eclipse.xtext</artifactId>
@@ -104,7 +97,6 @@
 			<artifactId>org.eclipse.uml2.common</artifactId>
 			<version>1.5.0.v201005031530</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.omg.sysml</groupId>
 			<artifactId>org.omg.sysml</artifactId>
@@ -155,7 +147,6 @@
 			<artifactId>org.omg.sysml.xtext.ui</artifactId>
 			<version>${sysml.version}</version>
 		</dependency>
-		
 		<dependency>
   			<groupId>org.omg.sysml</groupId>
   			<artifactId>org.omg.sysml.interactive</artifactId>
@@ -166,14 +157,11 @@
   			<artifactId>obp3-runtime</artifactId>
   			<version>1.0.0-main.39+1681ef1</version>
 		</dependency>
-		
 		<dependency>
   			<groupId>org.obpcdl</groupId>
   			<artifactId>obp3-algos</artifactId>
   			<version>1.0.0-main.39+1681ef1</version>
 		</dependency>
-		
-	
 	</dependencies>
 	
 	<dependencyManagement>

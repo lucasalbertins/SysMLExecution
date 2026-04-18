@@ -21,7 +21,8 @@ import org.omg.sysml.lang.sysml.PartDefinition;
 import org.omg.sysml.lang.sysml.ReferenceUsage;
 import org.omg.sysml.lang.sysml.StateUsage;
 
-class BatteryStatesContentTest {
+// OUTDATED
+public class BatteryStatesContentTest {
 
     static private SysMLV2Spec sysmlSpec;
     static private Namespace rootNamespace;

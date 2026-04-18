@@ -13,9 +13,10 @@ import org.omg.sysml.lang.sysml.FlowUsage;
 import org.omg.sysml.lang.sysml.Namespace;
 
 import adapters.behavior.actions.nodes.FlowUsageAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.utils.INamedElement;
+
+import br.ufrpe.dc.sysml.SysMLV2Spec;
 
 public class FlowUsageAdapterTest {
 
@@ -27,7 +28,7 @@ public class FlowUsageAdapterTest {
         spec = new SysMLV2Spec();
         spec.parseFile("control/ForkJoinExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace raiz nÃ£o deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
     }
 
     // Utils
@@ -37,7 +38,6 @@ public class FlowUsageAdapterTest {
         if (elt instanceof FlowUsage fu) {
             out.add(fu);
         }
-
         if (elt instanceof Namespace ns) {
             for (Element member : ns.getOwnedMember()) {
                 collectAllFlowUsages(member, out);
@@ -51,11 +51,9 @@ public class FlowUsageAdapterTest {
         if (end.getReferencedFeature() != null) {
             sb.append(end.getReferencedFeature().getDeclaredName()).append(".");
         }
-
         for (INamedElement ine : end.getChainingFeatures()) {
             sb.append(ine.getName()).append(".");
         }
-
         sb.append(end.getReferenceUsage().getName());
         return sb.toString();
     }
@@ -67,59 +65,50 @@ public class FlowUsageAdapterTest {
         collectAllFlowUsages(rootNamespace, flows);
 
         assertFalse(flows.isEmpty(),
-                "Nenhum FlowUsage encontrado no modelo");
+                "No FlowUsage found in the model.");
 
         for (FlowUsage flow : flows) {
 
             FlowUsageAdapter adapter = new FlowUsageAdapter(flow);
-
-            // Nome
+            // Name
             assertNotNull(adapter.getDeclaredName(),
-                    "FlowUsageAdapter deve possuir nome declarado");
-
+                    "FlowUsageAdapter must have a declared name.");
+            
             // Payload
             if (adapter.getPayload() != null) {
                 assertNotNull(adapter.getPayload().getName(),
-                        "Payload deve possuir nome");
+                        "Payload must have a name.");
             }
 
             // Source
             IFlowEnd source = adapter.getSource();
             assertNotNull(source,
-                    "Flow '" + adapter.getDeclaredName() + "' deve possuir source");
-
+                    "Flow '" + adapter.getDeclaredName() + "' must have a source.");
             assertNotNull(source.getReferenceUsage(),
-                    "Source deve possuir ReferenceUsage");
-
+                    "Source must have a ReferenceUsage.");
             assertNotNull(source.getChainingFeatures(),
-                    "Source deve possuir array de chaining features (mesmo vazio)");
-
+                    "Source must have an array of chaining features (even if empty).");
             if (source.getReferencedFeature() != null) {
                 assertNotNull(source.getReferencedFeature().getDeclaredName(),
-                        "ReferencedFeature do source deve possuir nome");
+                        "The source's ReferencedFeature must have a name.");
             }
-
             assertDoesNotThrow(() -> toPath(source),
-                    "Falha ao construir path do source");
+                    "Failed to build the source path.");
 
             // Target
             IFlowEnd target = adapter.getTarget();
             assertNotNull(target,
-                    "Flow '" + adapter.getDeclaredName() + "' deve possuir target");
-
+                    "Flow '" + adapter.getDeclaredName() + "' must have a target.");
             assertNotNull(target.getReferenceUsage(),
-                    "Target deve possuir ReferenceUsage");
-
+                    "Target must have a ReferenceUsage.");
             assertNotNull(target.getChainingFeatures(),
-                    "Target deve possuir array de chaining features (mesmo vazio)");
-
+                    "Target must have an array of chaining features (even if empty).");
             if (target.getReferencedFeature() != null) {
                 assertNotNull(target.getReferencedFeature().getDeclaredName(),
-                        "ReferencedFeature do target deve possuir nome");
+                        "The targe's ReferencedFeature must have a name.");
             }
-
             assertDoesNotThrow(() -> toPath(target),
-                    "Falha ao construir path do target");
+                    "Failed to build the target path.");
             
             // Print
             System.out.println("\n=== Testing FlowUsageAdapter for: " + adapter.getDeclaredName() + " ===");

@@ -20,7 +20,8 @@ import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
 
-class EvaluationUtilTest {
+// OUTDATED
+public class EvaluationUtilTest {
 
     private static SysMLV2Spec spec;
     private static Namespace root;

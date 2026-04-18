@@ -17,7 +17,8 @@ import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 
-class SimpleSuccessionTest {
+// OUTDATED
+public class SimpleSuccessionTest {
 	   private static SysMLV2Spec sysmlSpec;
 	    private static Namespace root;
 	    private static List<SuccessionAsUsage> successions;

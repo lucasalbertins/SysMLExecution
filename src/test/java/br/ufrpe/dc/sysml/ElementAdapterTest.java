@@ -4,20 +4,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.List;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 
 import adapters.utils.ElementAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
 
-class ElementAdapterTest {
+public class ElementAdapterTest {
 
     private static SysMLV2Spec sysmlSpec;
     private static Namespace rootNamespace;
@@ -28,7 +24,7 @@ class ElementAdapterTest {
         
         sysmlSpec.parseFile("control/DecisionExample.sysml");
         rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
     }
 
     private void collectAllElements(Element element, List<Element> out) {
@@ -45,28 +41,26 @@ class ElementAdapterTest {
     void testElementAdapterIDs() {
         List<Element> elements = new ArrayList<>();
         collectAllElements(rootNamespace, elements);
-        assertFalse(elements.isEmpty(), "Nenhum elemento encontrado no modelo");
+        assertFalse(elements.isEmpty(), "No element found in the model.");
 
-        System.out.println("=== TESTE DE ELEMENT IDs ===");
-
+        System.out.println("=== ELEMENT ID TEST ===");
         for (Element elem : elements) {
-            // cria adaptador
             ElementAdapter adapter = new ElementAdapter(elem);
 
             String directID = elem.getElementId();
             String adapterID = adapter.getID();
 
             String name = elem.getDeclaredName() != null ? elem.getDeclaredName() : "<no-name>";
-            System.out.printf("Elemento: %-20s | Direto: %-40s | Adapter: %-40s%n",
+            System.out.printf("Element: %-20s | Direct: %-40s | Adapter: %-40s%n",
                     name, directID, adapterID);
 
-            // Verifica consistência
+            // Checks consistency.
             if (directID != null) {
                 assertEquals(directID, adapterID,
-                        "IDs divergentes para o elemento: " + name);
+                        "Divergent IDs for the element: " + name);
             } else {
                 assertEquals("<no-id>", adapterID,
-                        "Esperava <no-id> para elemento sem ID: " + name);
+                        "Expected <no-id> for the element without an ID " + name);
             }
         }
     }

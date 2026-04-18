@@ -28,7 +28,7 @@ public class ControlNodeAdapterTest {
         spec = new SysMLV2Spec();
         spec.parseFile("control/ControlNodeTest.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
     }
 
     // Utils
@@ -38,7 +38,6 @@ public class ControlNodeAdapterTest {
         if (elt instanceof ControlNode cn) {
             out.add(cn);
         }
-
         if (elt instanceof Namespace ns) {
             for (Element member : ns.getOwnedMember()) {
                 collectControlNodes(member, out);
@@ -54,29 +53,26 @@ public class ControlNodeAdapterTest {
 	    return "Unknown";
 	}
 
-    // Tests
     @Test
     void testControlNodeAdapterClassification() {
         List<ControlNode> nodes = new ArrayList<>();
         collectControlNodes(rootNamespace, nodes);
 
         assertFalse(nodes.isEmpty(),
-                "Nenhum ControlNode encontrado no modelo");
+                "No ControlNode found in the model.");
 
         for (ControlNode node : nodes) {
-
             ControlNodeAdapter adapter = new ControlNodeAdapter(node);
 
-            // Nome
+            // Name
             assertNotNull(adapter.getDeclaredName(),
-                    "ControlNodeAdapter deve possuir nome declarado");
-
+                    "ControlNodeAdapter must have a declared name.");
             String actualType = resolveNodeType(adapter);
             assertNotEquals("Unknown", actualType,
                     "ControlNode '" + adapter.getDeclaredName()
-                    + "' não foi classificado");
+                    + "' was not classified.");
 
-            // Tipo
+            // Type
             String expectedType;
             if (node instanceof DecisionNode) {
                 expectedType = "DecisionNode";
@@ -87,13 +83,13 @@ public class ControlNodeAdapterTest {
             } else if (node instanceof MergeNode) {
                 expectedType = "MergeNode";
             } else {
-                fail("Tipo de ControlNode desconhecido: "
+                fail("Unknown ControlNode type: "
                      + node.getClass().getSimpleName());
                 return;
             }
 
             assertEquals(expectedType, actualType,
-                    "Classificação incorreta para ControlNode '"
+                    "Incorrect classification for ControlNode '"
                     + adapter.getDeclaredName() + "'");
 
             // Print

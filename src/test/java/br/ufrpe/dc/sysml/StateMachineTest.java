@@ -17,7 +17,8 @@ import org.omg.sysml.lang.sysml.TransitionUsage;
 import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
 import org.omg.sysml.lang.sysml.Expression;
 
-class StateMachineTest {
+// OUTDATED
+public class StateMachineTest {
 
     static private SysMLV2Spec sysmlSpec;
     static private Namespace rootNamespace;

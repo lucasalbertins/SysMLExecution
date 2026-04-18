@@ -6,8 +6,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.omg.sysml.lang.sysml.*;
 
-
-class ActionFlowSuccessionsTest {
+// OUTDATED
+public class ActionFlowSuccessionsTest {
 
     private static SysMLV2Spec spec;
     private static Namespace root;

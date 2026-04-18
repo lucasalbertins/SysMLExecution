@@ -9,7 +9,8 @@ import org.omg.sysml.lang.sysml.*;
 import adapters.structures.expressions.ExpressionAdapter;
 import adapters.structures.expressions.LiteralExpressionAdapter;
 
-class ExpressionAdapterTest {
+// OUTDATED
+public class ExpressionAdapterTest {
 
     static private SysMLV2Spec sysmlSpec;
     static private Namespace rootNamespace;

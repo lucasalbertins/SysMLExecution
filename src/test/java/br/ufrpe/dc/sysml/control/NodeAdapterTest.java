@@ -15,10 +15,11 @@ import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.TransitionUsage;
 
 import adapters.behavior.actions.nodes.NodeAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
 import interfaces.behavior.actions.ISuccession;
 
-class NodeAdapterTest {
+import br.ufrpe.dc.sysml.SysMLV2Spec;
+
+public class NodeAdapterTest {
 
     private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
@@ -28,7 +29,7 @@ class NodeAdapterTest {
         spec = new SysMLV2Spec();
         spec.parseFile("control/DecisionExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
     }
 
     // Utils
@@ -38,7 +39,6 @@ class NodeAdapterTest {
         if (elt instanceof ActionUsage au && !(elt instanceof TransitionUsage)) {
             out.add(au);
         }
-
         if (elt instanceof Namespace ns) {
             for (Element member : ns.getOwnedMember()) {
                 collectAllActions(member, out);
@@ -46,14 +46,13 @@ class NodeAdapterTest {
         }
     }
 
-    // Tests
     @Test
     void testNodeAdapterIncomingAndOutgoingSuccessions() {
         List<ActionUsage> actions = new ArrayList<>();
         collectAllActions(rootNamespace, actions);
 
         assertFalse(actions.isEmpty(),
-                "Nenhuma ActionUsage encontrada no modelo");
+                "No ActionUsage found in the model.");
 
         for (ActionUsage action : actions) {
 
@@ -63,43 +62,42 @@ class NodeAdapterTest {
             List<ISuccession> outgoings = adapter.getOutgoings();
 
             assertNotNull(incomings,
-                    "getIncomings() não deve retornar null");
+                    "getIncomings() must not return null.");
             assertNotNull(outgoings,
-                    "getOutgoings() não deve retornar null");
+                    "getOutgoings() must not return null.");
 
             // Incomings
             for (ISuccession inc : incomings) {
                 assertNotNull(inc,
-                        "Succession incoming não deve ser nula");
+                        "Succession incoming must not be null.");
 
                 assertNotNull(inc.getSource(),
-                        "Incoming deve ter source");
+                        "Incoming must have a source.");
 
                 assertNotNull(inc.getTarget(),
-                        "Incoming deve ter target");
-                // Traballhando com ID
+                        "Incoming must have a target.");
                 assertEquals(adapter.getID(),
                         inc.getTarget().getID(),
-                        "Em incoming, o node atual deve ser o TARGET");
+                        "Inside incoming, the current node should be the target.");
             }
 
             // Outgoings
             for (ISuccession out : outgoings) {
                 assertNotNull(out,
-                        "Succession outgoing não deve ser nula");
+                        "Succession outgoing must not be null.");
 
                 assertNotNull(out.getSource(),
-                        "Outgoing deve ter source");
+                        "Outgoing must have a source.");
 
                 assertNotNull(out.getTarget(),
-                        "Outgoing deve ter target");
+                        "Outgoing must have a target.");
 
                 assertEquals(adapter.getID(),
                         out.getSource().getID(),
-                        "Em outgoing, o node atual deve ser o SOURCE");
+                        "Inside outgoing, the current node should be the source.");
             }
 
-            // Interseções
+            // Intersections
             Set<ISuccession> intersection = new HashSet<>();
             for (ISuccession inc : incomings) {
                 for (ISuccession out : outgoings) {
@@ -108,7 +106,7 @@ class NodeAdapterTest {
                     }
                 }
             }
-            // outra forma de testar interseções
+            // Different way of testing intersections.
             Set<String> incomingIds = new HashSet<>();
             for (ISuccession inc : incomings) {
                 incomingIds.add(inc.getID());
@@ -117,12 +115,11 @@ class NodeAdapterTest {
             for (ISuccession out : outgoings) {
                 assertFalse(
                     incomingIds.contains(out.getID()),
-                    "Uma mesma Succession não pode ser incoming e outgoing do mesmo node"
+                    "The same succession cannot be both incoming and outgoing of the same node."
                 );
             }
-
             assertTrue(intersection.isEmpty(),
-                    "Uma mesma Succession não pode ser incoming e outgoing do mesmo node");
+                    "The same succession cannot be both incoming and outgoing of the same node.");
             
             // Print
             System.out.println("\n=== Testing NodeAdapter for: " + action.getDeclaredName() + " ===");      

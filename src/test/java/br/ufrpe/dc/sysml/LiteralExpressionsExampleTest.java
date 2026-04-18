@@ -12,7 +12,8 @@ import org.omg.sysml.lang.sysml.*;
 import adapters.structures.attributes.AttributeUsageAdapter;
 import adapters.structures.expressions.ExpressionAdapter;
 
-class LiteralExpressionsExampleTest{
+// OUTDATED
+public class LiteralExpressionsExampleTest{
 
     private static SysMLV2Spec sysmlSpec;
     private static Namespace rootNamespace;

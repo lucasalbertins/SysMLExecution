@@ -11,7 +11,8 @@ import adapters.behavior.states.StateUsageAdapter;
 
 //import java.util.List;
 
-class StateUsageAdapterTest {
+// OUTDATED
+public class StateUsageAdapterTest {
     static private SysMLV2Spec sysmlSpec;
     static private StateUsage stateUsage;
     static private StateUsageAdapter stateUsageAdapter;

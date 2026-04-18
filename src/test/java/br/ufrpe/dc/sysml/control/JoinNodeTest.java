@@ -12,7 +12,8 @@ import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 
-class JoinNodeTest {
+public class JoinNodeTest {
+	
     private static SysMLV2Spec sysmlSpec;
     private static Namespace rootNamespace;
 
@@ -21,10 +22,10 @@ class JoinNodeTest {
         sysmlSpec = new SysMLV2Spec();
         sysmlSpec.parseFile("control/ForkJoinExample.sysml");
         rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
     }
 
-    // percorre o Namespace e imprime a estrutura do modelo com as classes dos elementos correspondentes
+    // Iterates through the Namespace and prints the model structure with the classes of the corresponding elements.
     private void printElementStructure(Element element, int indent) {
         String prefix = "  ".repeat(indent);
         String className = element.getClass().getSimpleName();
@@ -39,7 +40,7 @@ class JoinNodeTest {
 
         if (element instanceof JoinNode jn) {
             if (!jn.getOwnedFeature().isEmpty()) {
-                System.out.println("Join Node Features:");
+                System.out.println("JoinNode Features:");
                 for (Feature ffeat : jn.getOwnedFeature()) {
                     String fclass = ffeat.eClass().getName();
                     String fdecl = ffeat.getDeclaredName() != null ? ffeat.getDeclaredName()
@@ -47,12 +48,12 @@ class JoinNodeTest {
                     System.out.printf("%s    Owned Feature: %s - %s%n", prefix, fclass, fdecl);
                 }
             } else {
-                System.out.printf("Join node %s nao possui features %n", jn.getDeclaredName());
+                System.out.printf("JoinNode %s doesn't have features %n", jn.getDeclaredName());
             }
         }
 
         if (element instanceof SuccessionAsUsage su) {
-            // usa getSource() e getTarget() para mostrar ligações reais
+            // Uses getSource() and getTarget() to showcase real connections.
             System.out.println(prefix + "SuccessionAsUsage:");
             if (!su.getSource().isEmpty()) {
                 for (Element src : su.getSource()) {
@@ -60,7 +61,7 @@ class JoinNodeTest {
                     System.out.printf("%s    Source -> %s (%s)%n", prefix, srcName, src.getClass().getSimpleName());
                 }
             } else {
-                System.out.printf("%s    Nenhuma Source%n", prefix);
+                System.out.printf("%s    No Source%n", prefix);
             }
             if (!su.getTarget().isEmpty()) {
                 for (Element tgt : su.getTarget()) {
@@ -68,14 +69,14 @@ class JoinNodeTest {
                     System.out.printf("%s    Target -> %s (%s)%n", prefix, tgtName, tgt.getClass().getSimpleName());
                 }
             } else {
-                System.out.printf("%s    Nenhuma Target%n", prefix);
+                System.out.printf("%s    No Target%n", prefix);
             }
         }
     }
 
     @Test
     void testPrintFullModelStructure() {
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
         System.out.println("=== FULL MODEL STRUCTURE ===");
         printElementStructure(rootNamespace, 0);
     }

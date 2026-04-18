@@ -11,8 +11,8 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.StateUsage;
 
-
-class SysMLV2SpecTest {
+// OUTDATED
+public class SysMLV2SpecTest {
 	static private SysMLV2Spec sysmlSpec;
 
     @BeforeAll

@@ -17,7 +17,8 @@ import org.omg.sysml.lang.sysml.AttributeUsage;
 import org.omg.sysml.lang.sysml.LiteralInteger;
 import org.omg.sysml.lang.sysml.DataType;
 
-class BatterySystemTest {
+// OUTDATED
+public class BatterySystemTest {
 
     static private SysMLV2Spec sysmlSpec;
     static private Namespace rootNamespace;

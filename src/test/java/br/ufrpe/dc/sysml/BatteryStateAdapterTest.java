@@ -11,7 +11,8 @@ import org.omg.sysml.lang.sysml.StateUsage;
 
 import adapters.behavior.states.StateUsageAdapter;
 
-class BatteryStateAdapterTest {
+// OUTDATED
+public class BatteryStateAdapterTest {
 
     private static SysMLV2Spec sysmlSpec;
     private static Namespace rootNamespace;

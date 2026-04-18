@@ -10,8 +10,8 @@ import org.omg.sysml.lang.sysml.*;
 import adapters.structures.parts.PartDefinitionAdapter;
 import adapters.structures.parts.PartUsageAdapter;
 
-
-class PartAdaptersTest {
+// OUTDATED
+public class PartAdaptersTest {
     private static SysMLV2Spec sysmlSpec;
     private static Namespace rootNamespace;
 

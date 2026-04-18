@@ -18,7 +18,8 @@ import org.omg.sysml.lang.sysml.PartDefinition;
 import org.omg.sysml.lang.sysml.PartUsage;
 import org.omg.sysml.lang.sysml.FeatureValue;
 
-class UnitExampleTest {
+// OUTDATED
+public class UnitExampleTest {
 
     static private SysMLV2Spec sysmlSpec;
     static private Namespace rootNamespace;

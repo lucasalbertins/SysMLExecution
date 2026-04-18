@@ -213,8 +213,6 @@ class DecisionNodeTest {
 	    return "";
 	}
 
-
-
 	@Test
 	void testPrintFullModelStructure() {
 		assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");

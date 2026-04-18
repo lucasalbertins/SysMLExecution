@@ -24,7 +24,7 @@ import interfaces.behavior.actions.nodes.INode;
 import interfaces.utils.INamedElement;
 import interfaces.utils.IParameter;
 
-class ActionUsageAdapterTest {
+public class ActionUsageAdapterTest {
 
     private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
@@ -35,19 +35,18 @@ class ActionUsageAdapterTest {
         spec = new SysMLV2Spec();
         spec.parseFile("control/ForkJoinExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
+        assertNotNull(rootNamespace, "The root namespace must not be null.");
         
         registry = new ActionDefinitionAdapterRegistry(rootNamespace);
-        assertNotNull(registry, "Registry não deve ser nulo");
+        assertNotNull(registry, "Registry must not be null.");
     }
 
-    // Utils (consegui filtrar para apenas instâncias exatas de ActionUsage)
+    // Utils (I managed to filter to only exact instances of ActionUsage)
     private void collectAllActionUsages(Element elt, List<ActionUsage> out) {
 
         if (elt.getClass().equals(ActionUsageImpl.class)) {
             out.add((ActionUsage) elt);
         }
-
         if (elt instanceof Namespace ns) {
             for (Element member : ns.getOwnedMember()) {
                 collectAllActionUsages(member, out);
@@ -55,15 +54,14 @@ class ActionUsageAdapterTest {
         }
     }
     
-    // Busca recursiva genérica por nome e tipo
+    // Generic recursive search by name and type.
     private static <T extends Element> Optional<T> findElementByNameRecursive(
             Element element, String name, Class<T> type) {
-
+    	
         if (type.isInstance(element)
                 && name.equals(element.getDeclaredName())) {
             return Optional.of(type.cast(element));
         }
-
         if (element instanceof Namespace ns) {
             for (Element child : ns.getOwnedMember()) {
                 Optional<T> result =
@@ -76,7 +74,7 @@ class ActionUsageAdapterTest {
         return Optional.empty();
     }
 
-    // Verifica semanticamente se existe parâmetro com nome e direção
+    // Semantically checks if a parameter with a name and direction exists.
     private boolean hasParameter(ActionUsageAdapter adapter,
                                  String paramName,
                                  String direction) {
@@ -90,7 +88,7 @@ class ActionUsageAdapterTest {
         return false;
     }
 
-    // Imprime o caminho do source/target de FlowUsage
+    // Prints the source/target path of a FlowUsage.
     private String toPath(IFlowEnd end) {
         StringBuilder sb = new StringBuilder();
         if (end.getReferencedFeature() != null) {
@@ -103,8 +101,6 @@ class ActionUsageAdapterTest {
         return sb.toString();
     }
 
-    
-    // Tests
     @Test
     void testMonitorBrakePedalParameters() {
         ActionUsage action =
@@ -114,12 +110,11 @@ class ActionUsageAdapterTest {
                 ActionUsage.class
             ).orElseThrow(() ->
                 new AssertionError(
-                    "ActionUsage 'monitorBrakePedal' não encontrada"));
+                    "ActionUsage 'monitorBrakePedal' not found."));
 
-        ActionUsageAdapter adapter =
-                new ActionUsageAdapter(action);
+        ActionUsageAdapter adapter =  new ActionUsageAdapter(action);
         
-        System.out.println("Exemplo");
+        System.out.println("Example");
         ActionDefinitionAdapter def = registry.getById(action.getActionDefinition().getFirst().getElementId());
         for (IParameter parameter : def.getParameters()) {
         	System.out.println(parameter.getDirection() + " " + parameter.getDeclaredName());
@@ -127,29 +122,23 @@ class ActionUsageAdapterTest {
 
         assertEquals("monitorBrakePedal",
                 adapter.getDeclaredName());
-
         assertEquals(1,
                 adapter.getParameters().length,
-                "monitorBrakePedal deve ter exatamente 1 parâmetro");
-
+                "monitorBrakePedal must have exactly 1 parameter.");
         assertTrue(
                 hasParameter(adapter, "brakePressure", "out"),
-                "monitorBrakePedal deve possuir parâmetro 'out brakePressure'");
-
+                "monitorBrakePedal must have an 'out brakePressure' parameter.");
         assertTrue(adapter.getFlows().length == 0,
-        		"monitorBrakePedal não deve possuir flows");
-        
+        		"monitorBrakePedal should not contain flows.");
         assertTrue(adapter.getNodes().length == 0,
-        		"monitorBrakePedal não deve possuir nodes");
-        
-        // Verifica que nenhum parâmetro está sem direção
+        		"monitorBrakePedal should not contain nodes.");
+        // Verifies that no parameter is directionless.
         for (IParameter p : adapter.getParameters()) {
             assertNotNull(
                     p.getDirection(),
-                    "Parâmetro '" + p.getDeclaredName()
-                    + "' não deve ter direção nula");
+                    "Parameter '" + p.getDeclaredName()
+                    + "' must not have a null direction.");
         }
-     
     }
     
     @Test
@@ -161,36 +150,33 @@ class ActionUsageAdapterTest {
                 ActionUsage.class
             ).orElseThrow(() ->
                 new AssertionError(
-                    "ActionUsage 'monitorTraction' não encontrada"));
+                    "ActionUsage 'monitorTraction' not found."));
 
-        ActionUsageAdapter adapter =
-                new ActionUsageAdapter(action);
+        ActionUsageAdapter adapter = new ActionUsageAdapter(action);
 
         assertEquals("monitorTraction",
                 adapter.getDeclaredName());
-
         assertEquals(1,
                 adapter.getParameters().length,
-                "monitorTraction deve ter exatamente 1 parâmetro");
+                "monitorTraction must have exactly 1 parameter.");
 
         assertTrue(
                 hasParameter(adapter, "modulationFrequency", "out"),
-                "monitorTraction deve possuir parâmetro 'out modulationFrequency'");
+                "monitorTraction must have an 'out modulationFrequency' parameter.");
 
         assertTrue(adapter.getFlows().length == 0,
-        		"monitorTraction não deve possuir flows");
+        		"monitorTraction should not contain flows.");
         
         assertTrue(adapter.getNodes().length == 0,
-        		"monitorTraction não deve possuir nodes");
+        		"monitorTraction should not contain nodes.");
         
-        // Verifica que nenhum parâmetro está sem direção
+        // Verifies that no parameter is directionless.
         for (IParameter p : adapter.getParameters()) {
             assertNotNull(
                     p.getDirection(),
-                    "Parâmetro '" + p.getDeclaredName()
-                    + "' não deve ter direção nula");
+                    "Parameter '" + p.getDeclaredName()
+                    + "' must not have a null direction.");
         }
-     
     }
     
     @Test
@@ -202,39 +188,33 @@ class ActionUsageAdapterTest {
                 ActionUsage.class
             ).orElseThrow(() ->
                 new AssertionError(
-                    "ActionUsage 'braking' não encontrada"));
+                    "ActionUsage 'braking' not found."));
 
-        ActionUsageAdapter adapter =
-                new ActionUsageAdapter(action);
+        ActionUsageAdapter adapter = new ActionUsageAdapter(action);
 
         assertEquals("braking",
                 adapter.getDeclaredName());
-
         assertEquals(2,
                 adapter.getParameters().length,
-                "braking deve possuir exatamente 2 parâmetros");
-
+                "braking must have exactly 2 parameters.");
         assertTrue(
                 hasParameter(adapter, "brakePressure", "in"),
-                "braking deve possuir parâmetro 'in brakePressure'");
-
+                "braking must have an 'in brakePressure' parameter.");
         assertTrue(
                 hasParameter(adapter, "modulationFrequency", "in"),
-                "braking deve possuir parâmetro 'in modulationFrequency'");
-
-        // Verifica que nenhum parâmetro está sem direção
+                "braking must have an 'in modulationFrequency' parameter.");
+        
+        // Verifies that no parameter is directionless.
         for (IParameter p : adapter.getParameters()) {
             assertNotNull(
                     p.getDirection(),
-                    "Parâmetro '" + p.getDeclaredName()
-                    + "' não deve ter direção nula");
+                    "Parameter '" + p.getDeclaredName()
+                    + "' must not have a null direction.");
         }
-
         assertTrue(adapter.getFlows().length == 0,
-        		"braking não deve possuir flows");
-
+        		"braking should not contain flows.");
         assertTrue(adapter.getNodes().length == 0,
-        		"braking não deve possuir nodes");
+        		"braking should not contain nodes.");
     }
     
     @Test
@@ -243,23 +223,19 @@ class ActionUsageAdapterTest {
         collectAllActionUsages(rootNamespace, actionUsages);
 
         assertFalse(actionUsages.isEmpty(),
-                "Nenhuma ActionUsage encontrada no modelo");
+                "No ActionUsage found in the model.");
 
         for (ActionUsage actionUsage : actionUsages) {
 
             ActionUsageAdapter adapter = new ActionUsageAdapter(actionUsage);
-            
-            // Print
             System.out.println("\n=== Testing ActionUsage for: " + adapter.getDeclaredName() + " ===");
             System.out.println("Definition:");
             System.out.println(adapter.getActionDefinition() != null ? 
             		adapter.getActionDefinition().getDeclaredName() : "<no-definition>");
-            
             System.out.println("\nParameters:");
             if (adapter.getInputs().length == 0 && adapter.getOutputs().length == 0) {
                 System.out.println("<no-parameters>");
             }
-
             if (adapter.getInputs().length != 0) {
             	System.out.println("Inputs:");
                 for (IParameter p : adapter.getInputs()) {
@@ -269,7 +245,6 @@ class ActionUsageAdapterTest {
                     );
                 }
             }
-
             if (adapter.getOutputs().length != 0) {
             	System.out.println("Outputs:");
                 for (IParameter p : adapter.getOutputs()) {
@@ -279,7 +254,6 @@ class ActionUsageAdapterTest {
                     );
                 }
             }
-    		
     		System.out.println("\nFlows:");
     		if (adapter.getFlows().length != 0) {
     			for (IFlow flow : adapter.getFlows()) {
@@ -290,7 +264,6 @@ class ActionUsageAdapterTest {
     		} else {
     			System.out.println("<no-flows>");
     		}
-    		
     		System.out.println("\nNodes:");
     		if (adapter.getNodes().length != 0) {
     			for (INode node : adapter.getNodes()) {
@@ -299,7 +272,6 @@ class ActionUsageAdapterTest {
     		} else {
     			System.out.println("<no-nodes>");
     		} 
-    		
         }
     }
 }
