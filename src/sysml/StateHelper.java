@@ -2,6 +2,7 @@ package sysml;
 
 import org.omg.sysml.lang.sysml.*;
 
+// OUTDATED
 public class StateHelper {
     public static void printState(StateUsage state, String indent) {
         System.out.println(indent + "StateUsage: " + state.getDeclaredName());

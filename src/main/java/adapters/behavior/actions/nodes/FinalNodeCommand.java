@@ -11,7 +11,7 @@ import gamine.domain.SysMLV2Configuration;
 
 public class FinalNodeCommand extends ActionNodeCommand {
 
-    @Override
+	@Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
         // 1. Creates copies of the current state lists.
         List<ISuccession> nextSuccessions = new ArrayList<>(configuration.successions);
@@ -23,7 +23,7 @@ public class FinalNodeCommand extends ActionNodeCommand {
         
         // 3. Customized log to correctly report that the path died.
         String nodeName = node.getDeclaredName() != null ? node.getDeclaredName() : node.getID();
-        System.out.printf("  [Final] Node '%s' reached. Journey completed successfully.!%n", nodeName);
+        System.out.printf("  [Final] Node '%s' reached. Journey completed successfully!%n", nodeName);
         // Avoid the usage of addOutgoings() or addOutgoingFlows().
         
         // 4. Returns the state without the tokens that have just been consumed.

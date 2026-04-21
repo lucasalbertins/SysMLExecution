@@ -2,6 +2,7 @@ package sysml;
 
 import org.omg.sysml.lang.sysml.*;
 
+// OUTDATED
 public class ElementPrinter {
 
     public static void printElementStructure(Element element, String indent) {

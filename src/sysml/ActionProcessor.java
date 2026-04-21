@@ -4,6 +4,7 @@ import org.eclipse.emf.common.util.EList;
 import org.omg.sysml.lang.sysml.*;
 import org.omg.sysml.util.ExpressionUtil;
 
+// OUTDATED
 public class ActionProcessor {
 
 //	EffectBehaviorUsage : ActionUsage =

@@ -3,6 +3,7 @@ package sysml;
 import org.omg.sysml.lang.sysml.Feature;
 import java.util.List;
 
+// OUTDATED
 public class FeaturePrinter {
 
     // Método genérico para imprimir as features de um elemento

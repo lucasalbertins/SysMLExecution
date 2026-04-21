@@ -2,6 +2,7 @@ package sysml;
 
 import org.omg.sysml.lang.sysml.*;
 
+// OUTDATED
 public class TransitionHelper {
 
     public static void printTransition(TransitionUsage transition, String indent) {

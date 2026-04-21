@@ -6,6 +6,7 @@ import java.util.List;
 import org.omg.sysml.lang.sysml.*;
 import org.omg.sysml.util.ExpressionUtil;
 
+// OUTDATED
 public class ExpressionHandler {
 
 	// Lidar com diferentes Expression's

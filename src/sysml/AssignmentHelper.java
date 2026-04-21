@@ -2,6 +2,7 @@ package sysml;
 
 import org.omg.sysml.lang.sysml.*;
 
+// OUTDATED
 public class AssignmentHelper {
 
     public static void printAssignment(AssignmentActionUsage assignment, String indent) {

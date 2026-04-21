@@ -9,6 +9,7 @@ import org.omg.sysml.interactive.SysMLInteractiveResult;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 
+// OUTDATED
 public class SysMLReader {
 
     public static void main(String[] args) {
