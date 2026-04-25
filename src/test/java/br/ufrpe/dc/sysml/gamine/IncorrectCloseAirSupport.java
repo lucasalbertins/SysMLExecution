@@ -16,7 +16,7 @@ import obp3.sli.core.operators.ToDetermistic;
 import obp3.traversal.dfs.DepthFirstTraversal;
 
 
-public class CloseAirSupportTest {
+public class IncorrectCloseAirSupport {
 	private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
     private static ActionUsageAdapterRegistry registry;
@@ -24,9 +24,9 @@ public class CloseAirSupportTest {
     @BeforeAll
     static void init() {
         spec = new SysMLV2Spec();
-        spec.parseFile("control/CloseAirSupport.sysml");
+        spec.parseFile("control/IncorrectCloseAirSupport.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        System.out.println("CloseAirSupport.sysml loaded");
+        System.out.println("IncorrectCloseAirSupport.sysml loaded");
         assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
         assertNotNull(registry, "Registry cannot be null.");

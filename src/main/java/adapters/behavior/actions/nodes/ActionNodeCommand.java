@@ -5,6 +5,7 @@ import java.util.List;
 
 import adapters.behavior.actions.SuccessionAdapter;
 import interfaces.behavior.actions.ISuccession;
+import interfaces.behavior.actions.nodes.IControlNode;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.behavior.actions.nodes.INodeCommand;
@@ -33,6 +34,20 @@ public class ActionNodeCommand implements INodeCommand {
 
     protected void removeIncomings(INode node, List<ISuccession> nextSuccessions) {
         if (node.getIncomings() == null) return;
+        
+        if (node.getIncomings().size() > 1 && !(node instanceof IControlNode)) {
+        	System.err.printf("  [WARNING] Implicit JoinNode detected in Action '%s'. " +
+                    "(%d incoming edges) \n  The use of an explicit JoinNode is recommended.%n", 
+                    node.getDeclaredName(), node.getIncomings().size());
+        }
+        
+        /*
+        throw new IllegalStateException(
+            String.format("SysML Topology Violation: Action '%s' has multiple entries (%d). " +
+                          "You must use an explicit 'JoinNode' to synchronize control flows.", 
+                          nodeName, node.getIncomings().size())
+        );
+        */
         
         for (ISuccession incoming : node.getIncomings()) {
         	// Removes EXACTLY 1 succession per incoming edge.
