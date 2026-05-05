@@ -10,7 +10,9 @@ public interface IControlNode extends INode {
 	
 	public boolean isMergeNode();
 	
-	public boolean isInitialNode();
+	public boolean isStartNode();
 	
-	public boolean isFinalNode();
+	public boolean isDoneNode();
+	
+	public boolean isTerminateNode();
 }

@@ -10,6 +10,10 @@ package SimpleSuccession {
   		first action3 then action4;
   		action action4;
   		first action4 then done;
+  		
+  		action action5;
+  		first action5 then action6;
+  		action action6;
 	}
 	
 	action test : testAction;

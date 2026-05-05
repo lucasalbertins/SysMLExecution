@@ -9,7 +9,7 @@ import interfaces.behavior.actions.nodes.INode;
 
 import gamine.domain.SysMLV2Configuration;
 
-public class FinalNodeCommand extends ActionNodeCommand {
+public class DoneNodeCommand extends ActionNodeCommand {
 
 	@Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {

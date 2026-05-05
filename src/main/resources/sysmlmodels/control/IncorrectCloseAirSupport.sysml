@@ -9,7 +9,6 @@ package CloseAirSupport {
 	action def DesignateObjective;
 	action def ReceiveFireOrder;
 	action def FireMunition;
-	action def HeadToObjective;
 	action def ObjectiveDestroyed;
 	action def ObserveDamages;
 	action def CollateObservations;
@@ -62,7 +61,7 @@ package CloseAirSupport {
 		then action fireMunition : FireMunition;
 		then headToObjective;
 
-		action headToObjective : HeadToObjective;
+		merge headToObjective;
 		then action objectiveDestroyed : ObjectiveDestroyed;
 		then action observeDamages : ObserveDamages;
 		then join04;

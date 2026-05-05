@@ -25,4 +25,6 @@ package TerminateActionsExample {
 				
 		action stop terminate;
 	}
+	
+	action monitored : MonitoredActivity;
 }

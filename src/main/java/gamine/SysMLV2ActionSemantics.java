@@ -43,9 +43,9 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         List<ISuccession> initialSuccessions = new ArrayList<>();
         List<IFlow> initialFlows = new ArrayList<>();
         
-        for (INode node: actionDefinition.getNodes()) {
-            if (node instanceof ControlNodeAdapter && ((ControlNodeAdapter)node).isInitialNode() ) {
-                System.out.println("Initial succession (source: start): " + node.getID());
+        for (INode node : actionDefinition.getNodes()) {
+            if (node instanceof ControlNodeAdapter && ((ControlNodeAdapter)node).isStartNode() ) {
+                System.out.println("Initial node (start): " + node.getID());
                 initialSuccessions.addAll(node.getOutgoings());
             }
         }
@@ -77,6 +77,22 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             
             if (targetNode != null && !enabledActions.containsKey(targetNode.getID()) && isNodeEnabled(targetNode, configuration)) {
                 enabledActions.put(targetNode.getID(), targetNode);
+            }
+        }
+        
+        if (enabledActions.isEmpty()) {
+            // If there are no enabled actions, but there are remaining succession tokens...
+            if (!configuration.successions.isEmpty()) {
+                System.err.println("[ERROR] Deadlock/Starvation detected!");
+                System.err.println("The simulation is unable to proceed, the following tokens are stuck:");
+                
+                for (ISuccession stuckToken : configuration.successions) {
+                    String targetName = stuckToken.getTarget() != null ? stuckToken.getTarget().getDeclaredName() : "<unknown>";
+                    System.err.println(" ----> " + targetName);
+                }
+                
+                // Throws the exception to immediately interrupt
+                throw new IllegalStateException("Deadlock detected in SysML topology. Check for Join nodes or orphan paths.");
             }
         }
         return new ArrayList<>(enabledActions.values());
@@ -133,7 +149,9 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
         if (node != null) {
-            System.out.println("\n[Execute] Executing node: " + node.getDeclaredName() + " via NodeCommandFactory");
+            System.out.println("\n[Execute] Executing node: " 
+            		+ node.getDeclaredName() 
+            		+ " via NodeCommandFactory");
             NodeCommandFactory.create(node).execute(node, configuration);
         }
         // Returns the structure itself using internal calculation.
@@ -145,38 +163,83 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         List<IFlow> nextFlows = new ArrayList<>(current.flows); 
         
         // --- CONSUMPTION PHASE ---
-        // Consumption of successions.
-        nextSuccessions.removeIf(token -> {
-            INode target = token.getTarget();
-            return target != null && target.getID().equals(node.getID());
-        });
-        // Consumption of flows.
-        nextFlows.removeIf(flow -> {
-            IFlowEnd targetEnd = flow.getTarget();
-            if (targetEnd != null && targetEnd.getReferencedFeature() != null) {
-            	// Consumes if the target feature of this flow is the node being executed.
-                return targetEnd.getReferencedFeature().getID().equals(node.getID());
+        if (node != null) {
+            boolean isMerge = false;
+            boolean isDone = false;
+            if (node instanceof ControlNodeAdapter) {
+                isMerge = ((ControlNodeAdapter) node).isMergeNode();
+                isDone = ((ControlNodeAdapter) node).isDoneNode();
             }
-            return false;
-        });
+
+            // 1. MERGE/DONE
+            if (isMerge || isDone) {
+                // Consumes ONLY 1 token that points to this node and stops!
+                // This resolves the "silent merge" and the "infinite done loop".
+                for (int i = 0; i < nextSuccessions.size(); i++) {
+                    INode target = nextSuccessions.get(i).getTarget();
+                    if (target != null && target.getID().equals(node.getID())) {
+                        nextSuccessions.remove(i);
+                        break; // <-- Deletes only 1 token 
+                    }
+                }
+            } 
+            // 2. ACTIONS/JOINS
+            else {
+                if (node.getIncomings() != null && !node.getIncomings().isEmpty()) {
+                    // Consumes 1 token from each mapped edge (standard)
+                    for (ISuccession incomingEdge : node.getIncomings()) {
+                        for (int i = 0; i < nextSuccessions.size(); i++) {
+                            if (nextSuccessions.get(i).getID().equals(incomingEdge.getID())) {
+                                nextSuccessions.remove(i);
+                                break; 
+                            }
+                        }
+                    }
+                } else {
+                    // 3. Fallback
+                    // If the node has no mapped entries (parser failure), it consumes 1 token pointing to it
+                    // to avoid infinite loops.
+                    for (int i = 0; i < nextSuccessions.size(); i++) {
+                        INode target = nextSuccessions.get(i).getTarget();
+                        if (target != null && target.getID().equals(node.getID())) {
+                            nextSuccessions.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (node.getIncomingFlows() != null) {
+                for (IFlow incomingFlow : node.getIncomingFlows()) {
+                    for (int i = 0; i < nextFlows.size(); i++) {
+                        if (nextFlows.get(i).getID().equals(incomingFlow.getID())) {
+                            nextFlows.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
         // --- PRODUCTION PHASE ---
         if (node != null) {
-        	// Produces successions.
-            for (ISuccession out : node.getOutgoings()) {
-                // Checks the guard here to respect the main semantic block.
-                boolean conditionMet = true;
-                if (out instanceof SuccessionAdapter sa) {
-                    conditionMet = sa.evaluateGuard();
-                }
-                
-                if (conditionMet) {
-                    nextSuccessions.add(out);
+            if (node.getOutgoings() != null) {
+                for (ISuccession out : node.getOutgoings()) {
+                    boolean conditionMet = true;
+                    if (out instanceof SuccessionAdapter sa) {
+                        conditionMet = sa.evaluateGuard();
+                    }
+                    
+                    if (conditionMet) {
+                        nextSuccessions.add(out);
+                    }
                 }
             }
-            // Produces flows.
-            for (IFlow outFlow : node.getOutgoingFlows()) {
-                nextFlows.add(outFlow);
+            
+            if (node.getOutgoingFlows() != null) {
+                for (IFlow outFlow : node.getOutgoingFlows()) {
+                    nextFlows.add(outFlow);
+                }
             }
         }
         return new SysMLV2Configuration(nextSuccessions, nextFlows);

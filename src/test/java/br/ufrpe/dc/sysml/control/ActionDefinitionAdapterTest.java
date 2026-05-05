@@ -113,15 +113,15 @@ public class ActionDefinitionAdapterTest {
         assertEquals("MonitorBrakePedal",
                 adapter.getDeclaredName());
         assertEquals(1,
-                adapter.getParameters().length,
+                adapter.getParameters().size(),
                 "MonitorBrakePedal must have exactly 1 parameter.");
         assertTrue(
                 hasParameter(adapter, "pressure", "out"),
                 "MonitorBrakePedal must have an 'out pressure' parameter.");
         // Structural consistency.
-        assertTrue(adapter.getFlows().length == 0,
+        assertTrue(adapter.getFlows().size() == 0,
                 "MonitorBrakePedal should not contain flows.");
-        assertTrue(adapter.getNodes().length == 0,
+        assertTrue(adapter.getNodes().size() == 0,
         		"MonitorBrakePedal should not contain nodes.");
         
         // Verifies that no parameter is directionless.
@@ -148,14 +148,14 @@ public class ActionDefinitionAdapterTest {
         assertEquals("MonitorTraction",
                 adapter.getDeclaredName());
         assertEquals(1,
-                adapter.getParameters().length,
+                adapter.getParameters().size(),
                 "MonitorTraction must have exactly 1 parameter.");
         assertTrue(
                 hasParameter(adapter, "modFreq", "out"),
                 "MonitorTraction must have an 'out modFreq' parameter.");
-        assertTrue(adapter.getFlows().length == 0,
+        assertTrue(adapter.getFlows().size() == 0,
         		"MonitorTraction should not contain flows.");
-        assertTrue(adapter.getNodes().length == 0,
+        assertTrue(adapter.getNodes().size() == 0,
         		"MonitorTraction should not contain nodes.");
         
         // Verifies that no parameter is directionless.
@@ -182,7 +182,7 @@ public class ActionDefinitionAdapterTest {
         assertEquals("Braking",
                 adapter.getDeclaredName());
         assertEquals(2,
-                adapter.getParameters().length,
+                adapter.getParameters().size(),
                 "Braking must have exactly 2 parameters.");
         assertTrue(
                 hasParameter(adapter, "brakePressure", "in"),
@@ -198,10 +198,10 @@ public class ActionDefinitionAdapterTest {
                     "Parâmetro '" + p.getDeclaredName()
                     + "' must not have a null direction.");
         }
-        assertTrue(adapter.getFlows().length == 0,
+        assertTrue(adapter.getFlows().size() == 0,
         		"Braking should not contain flows.");
 
-        assertTrue(adapter.getNodes().length == 0,
+        assertTrue(adapter.getNodes().size() == 0,
         		"Braking should not contain nodes.");
     }
     
@@ -220,7 +220,7 @@ public class ActionDefinitionAdapterTest {
         assertEquals("Brake",
                 adapter.getDeclaredName());
         assertEquals(0,
-                adapter.getParameters().length,
+                adapter.getParameters().size(),
                 "Brake must have exactly 0 parameters");
         
         // Verifies that no parameter is directionless.
@@ -230,9 +230,9 @@ public class ActionDefinitionAdapterTest {
                     "Parameter '" + p.getDeclaredName()
                     + "' must not have a null direction.");
         }
-        assertTrue(adapter.getFlows().length == 2,
+        assertTrue(adapter.getFlows().size() == 2,
         		"Braking should contain 2 flows.");
-        assertTrue(adapter.getNodes().length == 8,
+        assertTrue(adapter.getNodes().size() == 8,
         		"Braking should contain 8 nodes.");
     }
     
@@ -246,7 +246,7 @@ public class ActionDefinitionAdapterTest {
                     "ActionDefinitionAdapter must have a declared name.");
             
             // Parameters
-            IParameter[] parameters = adapter.getParameters();
+            List<IParameter> parameters = adapter.getParameters();
             assertNotNull(parameters,
                     "The parameter array must not be null.");
             for (IParameter parameter : parameters) {
@@ -258,7 +258,7 @@ public class ActionDefinitionAdapterTest {
             }
             
             // Nodes
-            INode[] nodes = adapter.getNodes();
+            List<INode> nodes = adapter.getNodes();
             assertNotNull(nodes,
                     "The node array must not be null.");
             
@@ -268,7 +268,7 @@ public class ActionDefinitionAdapterTest {
             }
 
             // Flows
-            IFlow[] flows = adapter.getFlows();
+            List<IFlow> flows = adapter.getFlows();
             assertNotNull(flows,
                     "The flow array must not be null.");
             for (IFlow flow : flows) {
@@ -290,28 +290,28 @@ public class ActionDefinitionAdapterTest {
             
             // MonitorBattery
             if (adapter.getDeclaredName().equals("MonitorBattery")) {
-                IParameter[] params = adapter.getParameters();
-                assertEquals(1, params.length,
+                List<IParameter> params = adapter.getParameters();
+                assertEquals(1, params.size(),
                         "MonitorBattery must have exactly 1 parameter.");
 
-                IParameter p = params[0];
+                IParameter p = params.get(0);
                 assertEquals("charge", p.getDeclaredName());
                 assertEquals("out", p.getDirection().toString().toLowerCase());
             }
             
             // AddCharge
             if (adapter.getDeclaredName().equals("AddCharge")) {
-                IParameter[] params = adapter.getParameters();
-                assertEquals(1, params.length,
+                List<IParameter> params = adapter.getParameters();
+                assertEquals(1, params.size(),
                         "AddCharge must have exatcly 1 parameter.");
-                IParameter p = params[0];
+                IParameter p = params.get(0);
                 assertEquals("charge", p.getDeclaredName());
                 assertEquals("in", p.getDirection().toString().toLowerCase());
             }
             
             // EndCharging
             if (adapter.getDeclaredName().equals("EndCharging")) {
-                assertEquals(0, adapter.getParameters().length,
+                assertEquals(0, adapter.getParameters().size(),
                         "EndCharging should not contain parameters.");
             }
 
@@ -334,7 +334,7 @@ public class ActionDefinitionAdapterTest {
             // Print
             System.out.println("\n=== Testing ActionDefinitionAdapter for: " + adapter.getDeclaredName() + " ===");
     		System.out.println("Parameters:");
-    		if (adapter.getParameters().length != 0) {
+    		if (adapter.getParameters().size() != 0) {
     			for (IParameter parameter : adapter.getParameters()) {
     				System.out.print(parameter.getDirection() != null ? parameter.getDirection() + " " : "<null> ");
         			System.out.println(parameter.getDeclaredName() != null ? parameter.getDeclaredName() : "<null>");
@@ -344,7 +344,7 @@ public class ActionDefinitionAdapterTest {
     		}
     		
     		System.out.println("\nFlows:");
-    		if (adapter.getFlows().length != 0) {
+    		if (adapter.getFlows().size() != 0) {
     			for (IFlow flow : adapter.getFlows()) {
         			System.out.println(flow.getDeclaredName());
         			System.out.println("from " + toPath(flow.getSource()));
@@ -355,7 +355,7 @@ public class ActionDefinitionAdapterTest {
     		}
     		
     		System.out.println("\nNodes:");
-    		if (adapter.getNodes().length != 0) {
+    		if (adapter.getNodes().size() != 0) {
     			for (INode node : adapter.getNodes()) {
     				System.out.println(node.getDeclaredName());
         		}

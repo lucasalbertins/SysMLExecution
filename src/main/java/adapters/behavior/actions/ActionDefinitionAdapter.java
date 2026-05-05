@@ -2,6 +2,7 @@ package adapters.behavior.actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.omg.sysml.lang.sysml.ActionDefinition;
 import org.omg.sysml.lang.sysml.ActionUsage;
@@ -25,10 +26,10 @@ import interfaces.utils.IParameter;
 
 public class ActionDefinitionAdapter extends NamedElementAdapter implements IActionDefinition {
 
-    private INode[] nodes;
-    private IParameter[] parameters;
-    private IFlow[] flows;
-    private HashMap<String,String> owners;
+    protected List<INode> nodes;
+    protected List<IParameter> parameters;
+    protected List<IFlow> flows;
+    protected HashMap<String,String> owners;
 
     // TODO: Analyze the usage of the owners variable.
     public ActionDefinitionAdapter(ActionDefinition actionDefinition) {
@@ -91,23 +92,23 @@ public class ActionDefinitionAdapter extends NamedElementAdapter implements IAct
         		}
         	}
         }
-    	this.nodes = nodeList.toArray(new INode[0]);
-        this.parameters = parameterList.toArray(new IParameter[0]);
-        this.flows = flowList.toArray(new IFlow[0]);
+    	this.nodes = nodeList;
+        this.parameters = parameterList;
+        this.flows = flowList;
     }
     
     @Override
-	public INode[] getNodes() {
+	public List<INode> getNodes() {
 		return this.nodes;
 	}
 
     @Override
-    public IParameter[] getParameters() {
+    public List<IParameter> getParameters() {
         return this.parameters;
     }
 
     @Override
-    public IFlow[] getFlows() {
+    public List<IFlow> getFlows() {
         return this.flows;
     }
     

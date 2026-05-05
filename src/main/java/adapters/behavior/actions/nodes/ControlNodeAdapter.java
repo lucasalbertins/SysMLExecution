@@ -6,6 +6,7 @@ import org.omg.sysml.lang.sysml.ForkNode;
 import org.omg.sysml.lang.sysml.JoinNode;
 import org.omg.sysml.lang.sysml.MergeNode;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
+import org.omg.sysml.lang.sysml.TerminateActionUsage;
 
 import adapters.utils.AdapterUtils;
 import adapters.utils.FinalNode;
@@ -61,14 +62,20 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	}
 
 	@Override
-	public boolean isInitialNode() {
+	public boolean isStartNode() {
 		// return nodeElement instanceof InitialNode;
-		return nodeElement.getDeclaredName().equals("start");
+		return "start".equals(nodeElement.getDeclaredName());
 	}
 
 	@Override
-	public boolean isFinalNode() {
+	public boolean isDoneNode() {
 		// return nodeElement instanceof FinalNode;
-		return nodeElement.getDeclaredName().equals("done");
+		return "done".equals(nodeElement.getDeclaredName());
+	}
+
+	// TODO: Analyze whether this method should belong to ActionUsageAdapter
+	@Override
+	public boolean isTerminateNode() {
+		return this.nodeElement instanceof TerminateActionUsage;
 	}
 }
