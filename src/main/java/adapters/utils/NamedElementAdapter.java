@@ -4,11 +4,12 @@ import org.omg.sysml.lang.sysml.Element;
 
 import interfaces.utils.INamedElement;
 
-public class NamedElementAdapter implements INamedElement {
+public class NamedElementAdapter extends ElementAdapter implements INamedElement {
 	
 	private Element namedElement;
 	
 	public NamedElementAdapter(Element namedElement) {
+		super(namedElement);
 		this.namedElement = namedElement;
 	}
 
@@ -20,10 +21,5 @@ public class NamedElementAdapter implements INamedElement {
 	@Override
 	public String getDeclaredName() {
 		return namedElement.getDeclaredName() != null ? namedElement.getDeclaredName() : "<no-declared-name>";
-	}
-
-	@Override
-	public String getID() {
-		return namedElement.getElementId() != null ? namedElement.getElementId() : "<no-id>";
 	}
 }
