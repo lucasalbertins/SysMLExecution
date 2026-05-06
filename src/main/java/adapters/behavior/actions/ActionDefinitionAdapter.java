@@ -15,8 +15,8 @@ import org.omg.sysml.lang.sysml.TransitionUsage;
 
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.FlowUsageAdapter;
-import adapters.utils.FinalNode;
-import adapters.utils.InitialNode;
+import adapters.utils.DoneNode;
+import adapters.utils.StartNode;
 import adapters.utils.NamedElementAdapter;
 import adapters.utils.ParameterAdapter;
 import interfaces.behavior.actions.IActionDefinition;
@@ -44,13 +44,13 @@ public class ActionDefinitionAdapter extends NamedElementAdapter implements IAct
             // InitialNode/FinalNode via SuccessionAsUsage.
             if (element instanceof SuccessionAsUsage su) {
                 if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
-                    InitialNode init = new InitialNode();
+                    StartNode init = new StartNode();
                     init.setDeclaredName("start");
                     init.setOwner(actionDefinition);
                     nodeList.add(new ControlNodeAdapter(init));
                 }
                 if ("done".equals(su.getTarget().getFirst().getDeclaredName())) {
-                    FinalNode fin = new FinalNode();
+                    DoneNode fin = new DoneNode();
                     fin.setDeclaredName("done");
                     fin.setOwner(actionDefinition);
                     nodeList.add(new ControlNodeAdapter(fin));

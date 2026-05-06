@@ -21,7 +21,7 @@ import org.omg.sysml.lang.sysml.OwningMembership;
 import org.omg.sysml.lang.sysml.Relationship;
 import org.omg.sysml.lang.sysml.TextualRepresentation;
 
-public class FinalNode implements Element {
+public class DoneNode implements Element {
 	
     private String elementId = UUID.randomUUID().toString();
 	private String declaredName;

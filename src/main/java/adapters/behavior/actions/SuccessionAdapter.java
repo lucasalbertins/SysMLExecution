@@ -41,9 +41,11 @@ public class SuccessionAdapter implements ISuccession {
                 src instanceof JoinNode) {
                 return new ControlNodeAdapter(src);
             }
-            if (src.getDeclaredName().equals("start") ||
-                src.getDeclaredName().equals("done")) {
-                return new ControlNodeAdapter(src);
+            if (src.getDeclaredName() != null) {
+            	if (src.getDeclaredName().equals("start") ||
+                        src.getDeclaredName().equals("done")) {
+                        return new ControlNodeAdapter(src);
+                    }
             }
             return new NodeAdapter(src);
         }
@@ -59,9 +61,11 @@ public class SuccessionAdapter implements ISuccession {
                 tgt instanceof JoinNode) {
                 return new ControlNodeAdapter(tgt);
             }
-            if (tgt.getDeclaredName().equals("start") ||
-                tgt.getDeclaredName().equals("done")) {
-                return new ControlNodeAdapter(tgt);
+            if (tgt.getDeclaredName() != null) {
+            	if (tgt.getDeclaredName().equals("start") ||
+                        tgt.getDeclaredName().equals("done")) {
+                        return new ControlNodeAdapter(tgt);
+                    }
             }
             return new NodeAdapter(tgt);
         }

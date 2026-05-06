@@ -13,6 +13,7 @@ import adapters.behavior.actions.SuccessionAdapter;
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeCommandFactory;
 import adapters.utils.AdapterUtils;
+import interfaces.behavior.actions.IActionUsage;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
@@ -51,6 +52,17 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         }
         return List.of(new SysMLV2Configuration(initialSuccessions, initialFlows));
     }
+    
+    // Retrieves the node (with the correct interfaces) using the generic arrow node.
+    private INode getRealNode(INode dumbNode) {
+        if (dumbNode == null) return null;
+        for (INode realNode : actionDefinition.getNodes()) {
+            if (realNode.getID().equals(dumbNode.getID())) {
+                return realNode; // Returns the ActionUsageAdapter or ControlNodeAdapter!
+            }
+        }
+        return dumbNode; // Fallback
+    }
 
     @Override
     public List<INode> actions(SysMLV2Configuration configuration) {
@@ -59,8 +71,11 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
         // 1. Checks targets based on successions.
         for (ISuccession succession : configuration.successions) {
-            INode target = succession.getTarget();
-            if (target == null) continue;
+            INode dumbTarget = succession.getTarget();
+            if (dumbTarget == null) continue;
+            
+            // We swap the generic for the high-end.
+            INode target = getRealNode(dumbTarget);
             
             if (!enabledActions.containsKey(target.getID()) && isNodeEnabled(target, configuration)) {
                 System.out.println("  [!] Node " + target.getDeclaredName() + " enabled for execution!");
@@ -166,27 +181,37 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         if (node != null) {
             boolean isMerge = false;
             boolean isDone = false;
+            boolean isTerminate = false;
+
             if (node instanceof ControlNodeAdapter) {
                 isMerge = ((ControlNodeAdapter) node).isMergeNode();
                 isDone = ((ControlNodeAdapter) node).isDoneNode();
             }
+            
+            if (node instanceof IActionUsage actionUsage) {
+                isTerminate = actionUsage.isTerminateNode();
+            }
 
-            // 1. MERGE/DONE
-            if (isMerge || isDone) {
-                // Consumes ONLY 1 token that points to this node and stops!
-                // This resolves the "silent merge" and the "infinite done loop".
+            // 1. TERMINATE
+            if (isTerminate) {
+                nextSuccessions.clear();
+                nextFlows.clear();
+                return new SysMLV2Configuration(nextSuccessions, nextFlows);
+            }
+            
+            // 2. MERGE/DONE
+            else if (isMerge || isDone) {
                 for (int i = 0; i < nextSuccessions.size(); i++) {
                     INode target = nextSuccessions.get(i).getTarget();
                     if (target != null && target.getID().equals(node.getID())) {
                         nextSuccessions.remove(i);
-                        break; // <-- Deletes only 1 token 
+                        break; 
                     }
                 }
             } 
-            // 2. ACTIONS/JOINS
+            // 3. ACTIONS/JOINS
             else {
                 if (node.getIncomings() != null && !node.getIncomings().isEmpty()) {
-                    // Consumes 1 token from each mapped edge (standard)
                     for (ISuccession incomingEdge : node.getIncomings()) {
                         for (int i = 0; i < nextSuccessions.size(); i++) {
                             if (nextSuccessions.get(i).getID().equals(incomingEdge.getID())) {
@@ -196,9 +221,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
                         }
                     }
                 } else {
-                    // 3. Fallback
-                    // If the node has no mapped entries (parser failure), it consumes 1 token pointing to it
-                    // to avoid infinite loops.
+                    // 4. Fallback
                     for (int i = 0; i < nextSuccessions.size(); i++) {
                         INode target = nextSuccessions.get(i).getTarget();
                         if (target != null && target.getID().equals(node.getID())) {
@@ -242,6 +265,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
                 }
             }
         }
+        
         return new SysMLV2Configuration(nextSuccessions, nextFlows);
     }
 }

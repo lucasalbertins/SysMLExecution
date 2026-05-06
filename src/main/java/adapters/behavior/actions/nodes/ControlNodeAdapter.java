@@ -9,8 +9,8 @@ import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.TerminateActionUsage;
 
 import adapters.utils.AdapterUtils;
-import adapters.utils.FinalNode;
-import adapters.utils.InitialNode;
+import adapters.utils.DoneNode;
+import adapters.utils.StartNode;
 import interfaces.behavior.actions.nodes.IControlNode;
 
 public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
@@ -18,7 +18,7 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	// TODO: Properly connect synthetic nodes (Initial/Final) to natural ones.
 	public ControlNodeAdapter(Element controlNodeElement) {
 		super(controlNodeElement);
-		if (controlNodeElement instanceof InitialNode) {
+		if (controlNodeElement instanceof StartNode) {
 			Element owner = controlNodeElement.getOwner();
 			for (Element element : owner.getOwnedElement()) {
 	            // InitialNode via SuccessionAsUsage.
@@ -28,7 +28,7 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	                }
 	            }
 			}
-		} else if (controlNodeElement instanceof FinalNode) {
+		} else if (controlNodeElement instanceof DoneNode) {
 			Element owner = controlNodeElement.getOwner();
 			for (Element element : owner.getOwnedElement()) {
 	            // FinalNode via SuccessionAsUsage.
@@ -71,11 +71,5 @@ public class ControlNodeAdapter extends NodeAdapter implements IControlNode {
 	public boolean isDoneNode() {
 		// return nodeElement instanceof FinalNode;
 		return "done".equals(nodeElement.getDeclaredName());
-	}
-
-	// TODO: Analyze whether this method should belong to ActionUsageAdapter
-	@Override
-	public boolean isTerminateNode() {
-		return this.nodeElement instanceof TerminateActionUsage;
 	}
 }

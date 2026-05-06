@@ -13,6 +13,4 @@ public interface IControlNode extends INode {
 	public boolean isStartNode();
 	
 	public boolean isDoneNode();
-	
-	public boolean isTerminateNode();
 }

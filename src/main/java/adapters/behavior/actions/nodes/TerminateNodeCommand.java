@@ -6,7 +6,7 @@ import interfaces.behavior.actions.nodes.INode;
 import interfaces.behavior.actions.nodes.INodeCommand;
 import gamine.domain.SysMLV2Configuration;
 
-public class TerminateActionNodeCommand implements INodeCommand {
+public class TerminateNodeCommand implements INodeCommand {
 
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {

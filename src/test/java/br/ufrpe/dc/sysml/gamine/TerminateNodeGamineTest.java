@@ -49,6 +49,9 @@ public class TerminateNodeGamineTest {
     
     @Test
     void newTest() {
+    	for (ActionUsageAdapter adapter : registry.getAll()) {
+    		System.out.println(adapter.getDeclaredName());
+    	}
     	var semantics = createSemantics("monitored");
         var deterministic = ToDetermistic.randomPolicy(semantics, System.nanoTime());
         var sequencer = new Sequencer<>(deterministic);

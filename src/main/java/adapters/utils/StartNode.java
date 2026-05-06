@@ -21,7 +21,7 @@ import org.omg.sysml.lang.sysml.OwningMembership;
 import org.omg.sysml.lang.sysml.Relationship;
 import org.omg.sysml.lang.sysml.TextualRepresentation;
 
-public class InitialNode implements Element {
+public class StartNode implements Element {
 	
     private String elementId = UUID.randomUUID().toString();
 	private String declaredName;

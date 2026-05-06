@@ -3,27 +3,19 @@ package TerminateActionsExample {
 	
 	action monitorCriticalActivity;
 	action criticalActivity;
-	action waitForTimeOut;
 	
 	action def MonitoredActivity {
 		first start;
 
-		then fork;
-			then performCriticalActivity;
-			then waitForTimeOut;
+		then fork fork1;
+			then monitorCriticalActivity;
+			then criticalActivity;
 					
-		action performCriticalActivity {
-			perform monitorCriticalActivity;
+		monitorCriticalActivity;
+		then terminate;
 			
-			perform criticalActivity;
-			then terminate;
-		}
-		then stop;
-		
-		action waitForTimeOut;
-		then stop;
-				
-		action stop terminate;
+		criticalActivity;
+		then terminate;
 	}
 	
 	action monitored : MonitoredActivity;

@@ -1,5 +1,6 @@
 package adapters.behavior.actions.nodes;
 
+import interfaces.behavior.actions.IActionUsage;
 import interfaces.behavior.actions.nodes.IControlNode;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.behavior.actions.nodes.INodeCommand;
@@ -18,8 +19,11 @@ public class NodeCommandFactory {
                 return new DecisionNodeCommand();
             if (controlNode.isDoneNode())
             	return new DoneNodeCommand();
-            if (controlNode.isTerminateNode()) // Maybe not the best way to organize.
-            	return new TerminateActionNodeCommand();
+        }
+        if (node instanceof IActionUsage actionUsage) {
+        	if (actionUsage.isTerminateNode()) {
+        		return new TerminateNodeCommand();
+        	}
         }
         return new ActionNodeCommand(); 
     }
