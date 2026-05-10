@@ -23,9 +23,18 @@ import obp3.runtime.sli.SemanticRelation;
 public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Configuration> {
 
     private ActionDefinitionAdapter actionDefinition;
+    private Map<String, INode> nodeRegistry;
 
     public SysMLV2ActionSemantics(ActionUsageAdapter usage) {
         this.actionDefinition = new ActionDefinitionAdapter(usage.getActionDefinition());
+        this.nodeRegistry = new HashMap<>();
+        
+        if (this.actionDefinition.getNodes() != null) {
+            for (INode node : this.actionDefinition.getNodes()) {
+                this.nodeRegistry.put(node.getID(), node);
+            }
+        }
+
         if (AdapterUtils.successions != null) {
             for (ISuccession succession : AdapterUtils.successions.values()) {
                 if (succession instanceof SuccessionAdapter sa) {
@@ -49,27 +58,6 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         }
         return List.of(new SysMLV2Configuration(initialSuccessions, initialFlows));
     }
-    
-    // Retrieves the node (with the correct interfaces) using the generic arrow node.
-    private INode getRealNode(INode dumbNode) {
-        if (dumbNode == null) return null;
-        for (INode realNode : actionDefinition.getNodes()) {
-            if (realNode.getID().equals(dumbNode.getID())) {
-                return realNode; // Returns the ActionUsageAdapter or ControlNodeAdapter.
-            }
-        }
-        return dumbNode; // Fallback
-    }
-
-    // Utility to map a Feature (coming from an IFlowEnd) back to an INode.
-    private INode findNodeByFeature(INamedElement feature) {
-        for (INode node : actionDefinition.getNodes()) {
-            if (node.getID().equals(feature.getID())) {
-                return node;
-            }
-        }
-        return null;
-    }
 
     @Override
     public List<INode> actions(SysMLV2Configuration configuration) {
@@ -81,7 +69,8 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             INode dumbTarget = succession.getTarget();
             if (dumbTarget == null) continue;
             
-            INode target = getRealNode(dumbTarget);
+            // getRealNode
+            INode target = nodeRegistry.getOrDefault(dumbTarget.getID(), dumbTarget);
             
             // Checks if the node is enabled.
             if (!enabledActions.containsKey(target.getID()) && 
@@ -96,7 +85,8 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             IFlowEnd targetEnd = flow.getTarget();
             if (targetEnd == null || targetEnd.getReferencedFeature() == null) continue;
 
-            INode targetNode = findNodeByFeature(targetEnd.getReferencedFeature());
+            // findNodeByFeature
+            INode targetNode = nodeRegistry.get(targetEnd.getReferencedFeature().getID());
             
             // Checks if the node is enabled.
             if (targetNode != null && !enabledActions.containsKey(targetNode.getID()) && 
@@ -106,7 +96,6 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         }
         
         if (enabledActions.isEmpty()) {
-        	// If there are no enabled actions, but there are remaining succession tokens
             if (!configuration.successions.isEmpty()) {
                 System.err.println("[ERROR] Deadlock/Starvation detected!");
                 System.err.println("The simulation is unable to proceed, the following tokens are stuck:");
@@ -115,7 +104,6 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
                     String targetName = stuckToken.getTarget() != null ? stuckToken.getTarget().getDeclaredName() : "<unknown>";
                     System.err.println(" ----> " + targetName);
                 }
-                // Throws the exception to immediately interrupt
                 throw new IllegalStateException("Deadlock detected in SysML topology. Check for Join nodes or orphan paths.");
             }
         }

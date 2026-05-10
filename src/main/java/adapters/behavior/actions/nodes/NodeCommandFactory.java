@@ -24,6 +24,9 @@ public class NodeCommandFactory {
         	if (actionUsage.isTerminateNode()) {
         		return new TerminateNodeCommand();
         	}
+        	if (actionUsage.isAssignmentActionNode()) {
+        		return new AssignmentActionNodeCommand();
+        	}
         }
         return new ActionNodeCommand(); 
     }

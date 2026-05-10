@@ -26,6 +26,8 @@ public interface IActionUsage extends INode {
 	
 	public boolean isTerminateNode();
 	
+	public boolean isAssignmentActionNode();
+	
 	//public boolean isCallBehaviorAction();
 	//public boolean isSendSignalAction();
 	//public boolean isAcceptEventAction();

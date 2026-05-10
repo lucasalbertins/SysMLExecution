@@ -8,7 +8,7 @@ import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
 
-public class MergeNodeCommand extends ActionNodeCommand {
+public class MergeNodeCommand extends NodeCommand {
     
     @Override
     public boolean isEnabled(INode node, SysMLV2Configuration configuration) {

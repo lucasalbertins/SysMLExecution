@@ -9,7 +9,7 @@ import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
 
-public class DecisionNodeCommand extends ActionNodeCommand {
+public class DecisionNodeCommand extends NodeCommand {
 
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {

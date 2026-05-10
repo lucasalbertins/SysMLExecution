@@ -8,9 +8,8 @@ import java.util.stream.Collectors;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
-import interfaces.behavior.actions.nodes.INodeCommand;
 
-public class TerminateNodeCommand implements INodeCommand {
+public class TerminateNodeCommand extends ActionNodeCommand {
 
     @Override
     public boolean isEnabled(INode node, SysMLV2Configuration configuration) {

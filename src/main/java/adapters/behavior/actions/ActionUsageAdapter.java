@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.omg.sysml.lang.sysml.ActionDefinition;
 import org.omg.sysml.lang.sysml.ActionUsage;
+import org.omg.sysml.lang.sysml.AssignmentActionUsage;
 import org.omg.sysml.lang.sysml.ControlNode;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Feature;
@@ -134,5 +135,10 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
 	@Override
 	public boolean isTerminateNode() {
 		return nodeElement instanceof TerminateActionUsage;
+	}
+	
+	@Override
+	public boolean isAssignmentActionNode() {
+		return nodeElement instanceof AssignmentActionUsage;
 	}
 }
