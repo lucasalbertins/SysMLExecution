@@ -13,8 +13,10 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.TerminateActionUsage;
 
-import adapters.behavior.actions.TerminateActionUsageAdapter;
+import adapters.behavior.actions.nodes.TerminateActionUsageAdapter;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
+import interfaces.behavior.actions.nodes.IFlowEnd;
+import interfaces.utils.INamedElement;
 
 public class TerminateActionUsageTest {
 	
@@ -59,8 +61,11 @@ public class TerminateActionUsageTest {
 
             TerminateActionUsageAdapter adapter = new TerminateActionUsageAdapter(tau);
             System.out.println(adapter.getDeclaredName());
-            System.out.println("FRE" + adapter.getfeatureReferenceExpression()); // não está captando
-            System.out.println("FCE" + adapter.getfeatureChainExpression());
+            if (adapter.getfeatureChainExpression() != null) {
+            	System.out.println("FRE" + adapter.getfeatureChainExpression().getDeclaredName());
+            } else {
+            	System.out.println("FCE" + adapter.getfeatureReferenceExpression().getDeclaredName());
+            }
         }
     }
 	

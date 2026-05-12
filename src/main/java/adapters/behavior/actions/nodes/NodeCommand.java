@@ -61,7 +61,7 @@ public abstract class NodeCommand implements INodeCommand {
             for (int i = 0; i < nextSuccessions.size(); i++) {
                 INode target = nextSuccessions.get(i).getTarget();
                 if (target != null && target.getID().equals(node.getID())) {
-                    System.out.println("  [-] Succession consumed (fallback): " + nextSuccessions.get(i).getID());
+                    System.out.println("  [-] Succession consumed: " + nextSuccessions.get(i).getID());
                     nextSuccessions.remove(i);
                     break;
                 }
@@ -108,7 +108,7 @@ public abstract class NodeCommand implements INodeCommand {
             for (int i = 0; i < nextFlows.size(); i++) {
                 if (nextFlows.get(i).getID().equals(incomingFlow.getID())) {
                     String payloadName = incomingFlow.getPayload() != null ? incomingFlow.getPayload().getDeclaredName() : "<no-payload>";
-                    System.out.printf("  [-] Flow consumed %s: %s [Payload: %s]%n", 
+                    System.out.printf("  [-] Flow '%s' consumed: %s [Payload: %s]%n", 
                             nextFlows.get(i).getDeclaredName(), 
                             nextFlows.get(i).getID(), 
                             payloadName);
@@ -125,7 +125,7 @@ public abstract class NodeCommand implements INodeCommand {
         for (IFlow outgoingFlow : node.getOutgoingFlows()) {
             nextFlows.add(outgoingFlow);
             String payloadName = outgoingFlow.getPayload() != null ? outgoingFlow.getPayload().getDeclaredName() : "<no-payload>";
-            System.out.printf("  [+] Flow produced %s: %s [Payload: %s]%n", 
+            System.out.printf("  [+] Flow '%s' produced: %s [Payload: %s]%n", 
                     outgoingFlow.getDeclaredName(), 
                     outgoingFlow.getID(), 
                     payloadName);

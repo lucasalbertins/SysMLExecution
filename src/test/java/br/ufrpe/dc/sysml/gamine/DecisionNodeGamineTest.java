@@ -55,7 +55,7 @@ public class DecisionNodeGamineTest {
         int[] count = new int[]{10};
 
         var result = sequencer.run(c -> {
-            System.out.println("---- " + c);
+            System.out.println("----- " + c);
             return count[0]-- <= 1;
         });
     }

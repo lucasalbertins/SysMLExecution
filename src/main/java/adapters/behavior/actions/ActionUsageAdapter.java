@@ -8,6 +8,7 @@ import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.AssignmentActionUsage;
 import org.omg.sysml.lang.sysml.ControlNode;
 import org.omg.sysml.lang.sysml.Element;
+import org.omg.sysml.lang.sysml.Expression;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FeatureDirectionKind;
 import org.omg.sysml.lang.sysml.FlowUsage;
@@ -21,124 +22,139 @@ import adapters.behavior.actions.nodes.NodeAdapter;
 import adapters.utils.DoneNode;
 import adapters.utils.StartNode;
 import adapters.utils.ParameterAdapter;
+import interfaces.behavior.actions.IActionDefinition;
 import interfaces.behavior.actions.IActionUsage;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
+import interfaces.structures.expressions.IExpression;
 import interfaces.utils.IParameter;
 
 public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
 	
-	private ActionDefinition actionDefinition;
-	private IParameter[] parameters;
-	private INode[] nodes;
-	private IFlow[] flows;
+    private ActionDefinition rawDefinition;
+    private IActionDefinition actionDefinitionAdapter;
+    
+    private IParameter[] parameters;
+    private INode[] nodes;
+    private IFlow[] flows;
 
-	public ActionUsageAdapter(ActionUsage actionUsage) {
-		super(actionUsage);
-		
-		ArrayList<IParameter> parameterList = new ArrayList<>();
-		ArrayList<INode> nodeList = new ArrayList<>();
-		ArrayList<IFlow> flowList = new ArrayList<>();
-		
-		if (actionUsage.getActionDefinition().getFirst() != null) {
-			this.actionDefinition = (ActionDefinition) actionUsage.getActionDefinition().getFirst();
-		}
-		
-		for (Element element : actionUsage.getOwnedMember()) {
-			// InitialNode/FinalNode via SuccessionAsUsage.
-			if (element instanceof SuccessionAsUsage su) {
-				if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
+    public ActionUsageAdapter(ActionUsage actionUsage) {
+        super(actionUsage);
+        
+        ArrayList<IParameter> parameterList = new ArrayList<>();
+        ArrayList<INode> nodeList = new ArrayList<>();
+        ArrayList<IFlow> flowList = new ArrayList<>();
+        
+        
+        if (actionUsage.getActionDefinition().getFirst() != null) {
+            this.rawDefinition = (ActionDefinition) actionUsage.getActionDefinition().getFirst();
+        }
+        
+        for (Element element : actionUsage.getOwnedMember()) {
+            // InitialNode/FinalNode via SuccessionAsUsage.
+            if (element instanceof SuccessionAsUsage su) {
+                if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
                     StartNode init = new StartNode();
                     init.setDeclaredName("start");
-                    init.setOwner(actionDefinition);
+                    if (this.rawDefinition != null) {
+                        init.setOwner(this.rawDefinition);
+                    }
                     nodeList.add(new ControlNodeAdapter(init));
                 }
                 if ("done".equals(su.getTarget().getFirst().getDeclaredName())) {
                     DoneNode fin = new DoneNode();
                     fin.setDeclaredName("done");
-                    fin.setOwner(actionDefinition);
+                    if (this.rawDefinition != null) {
+                        fin.setOwner(this.rawDefinition);
+                    }
                     nodeList.add(new ControlNodeAdapter(fin));
                 }
-			}
-			// ActionUsage (except TransitionUsage).
+            }
+            // ActionUsage (except TransitionUsage).
             else if (element instanceof ActionUsage au && !(element instanceof TransitionUsage)) {
                 nodeList.add(new ActionUsageAdapter(au));
             }
-			// ActionUsage parameters.
+            // ActionUsage parameters.
             else if (element instanceof Feature f && f.getDirection() != null) {
                 parameterList.add(new ParameterAdapter(f));
             }
-        	// ControlNode
-        	else if (element instanceof ControlNode cn) {
-        		nodeList.add(new ControlNodeAdapter(cn));
-        	} 
-        	// FlowUsage
-        	else if (element instanceof FlowUsage fu) {
-        		nodeList.add(new NodeAdapter(fu));
-        		flowList.add(new FlowUsageAdapter(fu));
-        	}
+            // ControlNode
+            else if (element instanceof ControlNode cn) {
+                nodeList.add(new ControlNodeAdapter(cn));
+            } 
+            // FlowUsage
+            else if (element instanceof FlowUsage fu) {
+                nodeList.add(new NodeAdapter(fu));
+                flowList.add(new FlowUsageAdapter(fu));
+            }
         }
-		this.parameters = parameterList.toArray(new IParameter[0]);
-		this.nodes = nodeList.toArray(new INode[0]);
-		this.flows = flowList.toArray(new IFlow[0]);
-	}
-	
-	// Auxiliary method for separating inputs from outputs in the parameter list.
-	private IParameter[] extractByDirection(FeatureDirectionKind... dirs) {
-	    List<IParameter> result = new ArrayList<>();
+        this.parameters = parameterList.toArray(new IParameter[0]);
+        this.nodes = nodeList.toArray(new INode[0]);
+        this.flows = flowList.toArray(new IFlow[0]);
+    }
+    
+    private IParameter[] extractByDirection(FeatureDirectionKind... dirs) {
+        List<IParameter> result = new ArrayList<>();
+        for (IParameter p : parameters) {
+            for (FeatureDirectionKind d : dirs) {
+                if (p.getDirection() == d) {
+                    result.add(p);
+                    break;
+                }
+            }
+        }
+        return result.toArray(new IParameter[0]);
+    }
+    
+    @Override
+    public INode[] getNodes() {
+        return this.nodes;
+    }
 
-	    for (IParameter p : parameters) {
-	        for (FeatureDirectionKind d : dirs) {
-	            if (p.getDirection() == d) {
-	                result.add(p);
-	                break;
-	            }
-	        }
-	    }
-	    return result.toArray(new IParameter[0]);
-	}
-	
-	@Override
-	public INode[] getNodes() {
-		return this.nodes;
-	}
+    @Override
+    public IParameter[] getParameters() {
+        return this.parameters;
+    }
+    
+    @Override
+    public IExpression getArgument() {
+    	return null;
+    }
 
-	@Override
-	public IParameter[] getParameters() {
-		return this.parameters;
-	}
+    @Override
+    public IActionDefinition getActionDefinition() {
+        if (this.actionDefinitionAdapter == null && this.rawDefinition != null) {
+            this.actionDefinitionAdapter = new ActionDefinitionAdapter(this.rawDefinition);
+        }
+        return this.actionDefinitionAdapter;
+    }
 
-	@Override
-	public ActionDefinition getActionDefinition() {
-		return this.actionDefinition;
-	}
+    @Override
+    public IFlow[] getFlows() {
+        return this.flows;
+    }
 
-	@Override
-	public IFlow[] getFlows() {
-		return this.flows;
-	}
+    @Override
+    public IParameter[] getInputs() {
+        return extractByDirection(FeatureDirectionKind.IN, FeatureDirectionKind.INOUT);
+    }
 
-	@Override
-	public IParameter[] getInputs() {
-	    return extractByDirection(FeatureDirectionKind.IN, FeatureDirectionKind.INOUT);
-	}
+    @Override
+    public IParameter[] getOutputs() {
+        return extractByDirection(FeatureDirectionKind.OUT, FeatureDirectionKind.INOUT);
+    }
 
-	@Override
-	public IParameter[] getOutputs() {
-	    return extractByDirection(FeatureDirectionKind.OUT, FeatureDirectionKind.INOUT);
-	}
+    public boolean isCallAction() {
+        return this.rawDefinition != null;
+    }
 
-	public boolean isCallAction() {
-	    return actionDefinition != null;
-	}
-
-	@Override
-	public boolean isTerminateNode() {
-		return nodeElement instanceof TerminateActionUsage;
-	}
-	
-	@Override
-	public boolean isAssignmentActionNode() {
-		return nodeElement instanceof AssignmentActionUsage;
-	}
+    @Override
+    public boolean isTerminateNode() {
+        return nodeElement instanceof TerminateActionUsage;
+    }
+    
+    @Override
+    public boolean isAssignmentActionNode() {
+        return nodeElement instanceof AssignmentActionUsage;
+    }
 }

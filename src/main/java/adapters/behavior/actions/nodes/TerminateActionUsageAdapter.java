@@ -1,13 +1,13 @@
-package adapters.behavior.actions;
+package adapters.behavior.actions.nodes;
 
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Expression;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FeatureChainExpression;
 import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
+import org.omg.sysml.lang.sysml.ReferenceUsage;
 import org.omg.sysml.lang.sysml.TerminateActionUsage;
 
-import adapters.behavior.actions.nodes.NodeAdapter;
 import adapters.utils.NamedElementAdapter;
 import interfaces.utils.INamedElement;
 
@@ -21,14 +21,21 @@ public class TerminateActionUsageAdapter extends NodeAdapter {
 		super(tau);
 		
 		this.expression = tau.getTerminatedOccurrenceArgument();
+		System.out.println(expression);
 		for (Element elem : tau.getOwnedMember()) {
-			if (elem instanceof FeatureChainExpression fce) {
-				System.out.println("YAY");
-				this.featureChainExpression = new NamedElementAdapter(fce);
-			}
-			else if (elem instanceof FeatureReferenceExpression fre) {
-				System.out.println("YEY");
-				this.featureReferenceExpression = new NamedElementAdapter(fre);
+			if (elem instanceof ReferenceUsage ru) {
+				for (Element elt : ru.getOwnedMember()) {
+					if (elt instanceof FeatureChainExpression fce) {
+						if (fce.getDeclaredName() != null) {
+							this.featureChainExpression = new NamedElementAdapter(fce);
+						}
+					}
+					if (elt instanceof FeatureReferenceExpression fre) {
+						if (fre.getDeclaredName() != null) {
+							this.featureReferenceExpression = new NamedElementAdapter(fre);
+						}
+					}
+				}
 			}
 		}
 	}

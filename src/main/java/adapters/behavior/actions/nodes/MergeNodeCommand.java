@@ -30,7 +30,7 @@ public class MergeNodeCommand extends NodeCommand {
         for (ISuccession incoming : node.getIncomings()) {
             for (int i = 0; i < nextSuccessions.size(); i++) {
                 if (nextSuccessions.get(i).getID().equals(incoming.getID())) {
-                    System.out.println("  [-] Succession consumed (Merge): " + nextSuccessions.get(i).getID());
+                    System.out.println("  [-] Succession consumed: " + nextSuccessions.get(i).getID());
                     nextSuccessions.remove(i);
                     return; // Returns immediately after consuming 1 token.
                 }

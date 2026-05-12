@@ -36,7 +36,7 @@ package NewDecisionExample {
 	part part1 : Part1 {
 		perform action chargeBattery : ChargeBattery {
 			action :>> monitor {
-				out :>> batteryCharge = 120;
+				out :>> batteryCharge = 80;
 			}
 		}
 	}

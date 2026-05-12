@@ -5,36 +5,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import adapters.behavior.actions.ActionDefinitionAdapter;
 import adapters.behavior.actions.ActionUsageAdapter;
 import adapters.behavior.actions.SuccessionAdapter;
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeCommandFactory;
 import adapters.utils.AdapterUtils;
+import interfaces.behavior.actions.IActionDefinition;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.behavior.actions.nodes.INode;
-import interfaces.utils.INamedElement;
-
+import interfaces.behavior.actions.nodes.INodeCommand;
 import gamine.domain.SysMLV2Configuration;
 import obp3.runtime.sli.SemanticRelation;
 
 public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Configuration> {
 
-    private ActionDefinitionAdapter actionDefinition;
+	private IActionDefinition actionDefinition;
     private Map<String, INode> nodeRegistry;
 
     public SysMLV2ActionSemantics(ActionUsageAdapter usage) {
-        this.actionDefinition = new ActionDefinitionAdapter(usage.getActionDefinition());
+        this.actionDefinition = usage.getActionDefinition();
         this.nodeRegistry = new HashMap<>();
         
-        if (this.actionDefinition.getNodes() != null) {
-            for (INode node : this.actionDefinition.getNodes()) {
+        if (actionDefinition != null && actionDefinition.getNodes() != null) {
+            for (INode node : actionDefinition.getNodes()) {
                 this.nodeRegistry.put(node.getID(), node);
             }
         }
-
         if (AdapterUtils.successions != null) {
             for (ISuccession succession : AdapterUtils.successions.values()) {
                 if (succession instanceof SuccessionAdapter sa) {
@@ -46,14 +44,17 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
     @Override
     public List<SysMLV2Configuration> initial() {
-        System.out.println("\n[Initial] Searching initial state");
+        System.out.println("\n[Initial] Searching initial state.");
         List<ISuccession> initialSuccessions = new ArrayList<>();
         List<IFlow> initialFlows = new ArrayList<>();
         
-        for (INode node : actionDefinition.getNodes()) {
-            if (node instanceof ControlNodeAdapter && ((ControlNodeAdapter)node).isStartNode() ) {
-                System.out.println("Initial node (start): " + node.getID());
-                initialSuccessions.addAll(node.getOutgoings());
+        if (actionDefinition != null && actionDefinition.getNodes() != null) {
+        	for (INode node : actionDefinition.getNodes()) {
+                if (node instanceof ControlNodeAdapter && ((ControlNodeAdapter)node).isStartNode() ) {
+                    System.out.println("  [!] StartNode reached: " + node.getID());
+                    System.out.println("  [+] Succession produced: " + node.getOutgoings().getFirst().getID());
+                    initialSuccessions.addAll(node.getOutgoings());
+                }
             }
         }
         return List.of(new SysMLV2Configuration(initialSuccessions, initialFlows));
@@ -61,7 +62,10 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
     @Override
     public List<INode> actions(SysMLV2Configuration configuration) {
-        System.out.println("\n[Actions] Checking available actions");
+    	if (configuration.successions.isEmpty() && configuration.flows.isEmpty()) {
+            return new ArrayList<>(); 
+        }
+        System.out.println("\n[Actions] Checking available actions.");
         Map<String, INode> enabledActions = new HashMap<>();
 
         // 1. Checks targets based on successions.
@@ -75,7 +79,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             // Checks if the node is enabled.
             if (!enabledActions.containsKey(target.getID()) && 
                 NodeCommandFactory.create(target).isEnabled(target, configuration)) {
-                System.out.println("  [!] Node " + target.getDeclaredName() + " enabled for execution!");
+                System.out.println("  [!] Node '" + target.getDeclaredName() + "' enabled for execution!");
                 enabledActions.put(target.getID(), target);
             }
         }
@@ -97,12 +101,12 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         
         if (enabledActions.isEmpty()) {
             if (!configuration.successions.isEmpty()) {
-                System.err.println("[ERROR] Deadlock/Starvation detected!");
-                System.err.println("The simulation is unable to proceed, the following tokens are stuck:");
+                System.err.println("[SIMULATION ERROR] Deadlock/Starvation detected!");
+                System.err.println("  [x] Stuck nodes:");
                 
                 for (ISuccession stuckToken : configuration.successions) {
                     String targetName = stuckToken.getTarget() != null ? stuckToken.getTarget().getDeclaredName() : "<unknown>";
-                    System.err.println(" ----> " + targetName);
+                    System.err.println("      - " + targetName);
                 }
                 throw new IllegalStateException("Deadlock detected in SysML topology. Check for Join nodes or orphan paths.");
             }
@@ -112,13 +116,12 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
-        if (node != null) {
-            System.out.println("\n[Execute] Executing node: " 
-                    + node.getDeclaredName() 
-                    + " via NodeCommandFactory");
-            
-            // The command processes and returns the configured lists.
-            return NodeCommandFactory.create(node).execute(node, configuration);
+    	if (node != null) {
+            INodeCommand command = NodeCommandFactory.create(node);
+            System.out.println("\n[Execute] Executing " + 
+            		command.getClass().getSimpleName().replace("Command", "") 
+            		+ ": " + node.getDeclaredName());
+            return command.execute(node, configuration);
         }
         return List.of(configuration);
     }

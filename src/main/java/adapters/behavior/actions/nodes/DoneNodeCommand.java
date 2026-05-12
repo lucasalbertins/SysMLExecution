@@ -18,9 +18,7 @@ public class DoneNodeCommand extends NodeCommand {
         removeIncomings(node, nextSuccessions);
         removeIncomingFlows(node, nextFlows);
         
-        String nodeName = node.getDeclaredName() != null ? node.getDeclaredName() : node.getID();
-        System.out.printf("  [Final] Node '%s' reached. Journey completed successfully!%n", nodeName);
-        
+        System.out.println("  [!] DoneNode reached. Journey completed successfully!");
         return List.of(new SysMLV2Configuration(nextSuccessions, nextFlows));
     }
 }

@@ -31,10 +31,10 @@ public class DecisionNodeCommand extends NodeCommand {
                 nextSuccessions.add(outgoing);
                 addOutgoingFlows(node, nextFlows);
                 
-                System.out.printf("  [Decision] Path allowed. [+] Succession produced: %s%n", outgoing.getID());
+                System.out.printf("  [o] Path allowed.\n  [+] Succession produced: %s%n", outgoing.getID());
                 possibleNextStates.add(new SysMLV2Configuration(nextSuccessions, nextFlows));
             } else {
-                System.out.printf("  [Decision] Path blocked by guard: %s%n", outgoing.getID());
+                System.out.printf("  [x] Path blocked by guard: %s%n", outgoing.getID());
             }
         }
         return possibleNextStates; 

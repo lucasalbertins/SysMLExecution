@@ -25,7 +25,7 @@ public class TerminateNodeCommand extends ActionNodeCommand {
 
     @Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
-        System.err.println(" [!] TERMINATE ACTION REACHED: " + (node.getDeclaredName() != null ? node.getDeclaredName() : "<no-declared-name>"));
+        System.err.println(" [!] TerminateNode reached: " + (node.getDeclaredName() != null ? node.getDeclaredName() : "<no-declared-name>"));
         System.err.println("     Succession tokens destroyed: " + configuration.successions.size());
         for (ISuccession succession : configuration.successions) {
             System.err.println("     " + succession.getID());
