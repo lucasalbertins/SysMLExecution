@@ -3,12 +3,9 @@ package interfaces.behavior.actions;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.structures.expressions.IExpression;
+import interfaces.utils.IParameter;
 
 import java.util.List;
-
-import org.omg.sysml.lang.sysml.ActionDefinition;
-
-import interfaces.utils.IParameter;
 
 public interface IActionUsage extends INode {
 
@@ -23,6 +20,7 @@ public interface IActionUsage extends INode {
 	public boolean isCallAction();
 	public boolean isTerminateNode();
 	public boolean isAssignmentActionNode();
+	public List<IAssignmentActionUsage> getNestedAssignments();
 	
 	//public boolean isCallBehaviorAction();
 	//public boolean isSendSignalAction();

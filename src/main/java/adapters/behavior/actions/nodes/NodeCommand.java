@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import adapters.behavior.actions.SuccessionAdapter;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IControlNode;
@@ -91,7 +90,7 @@ public abstract class NodeCommand implements INodeCommand {
         
         for (ISuccession outgoing : node.getOutgoings()) {
             boolean conditionMet = true;
-            if (outgoing instanceof SuccessionAdapter sa) {
+            if (outgoing instanceof ISuccession sa) {
                 conditionMet = sa.evaluateGuard();
             }
             if (conditionMet) {

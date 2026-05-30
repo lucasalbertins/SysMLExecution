@@ -5,13 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import adapters.behavior.actions.ActionUsageAdapter;
-import adapters.behavior.actions.SuccessionAdapter;
-import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeCommandFactory;
 import adapters.utils.AdapterUtils;
 import interfaces.behavior.actions.IActionDefinition;
+import interfaces.behavior.actions.IActionUsage;
 import interfaces.behavior.actions.ISuccession;
+import interfaces.behavior.actions.nodes.IControlNode;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.behavior.actions.nodes.INode;
@@ -24,7 +23,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
 	private IActionDefinition actionDefinition;
     private Map<String, INode> nodeRegistry;
 
-    public SysMLV2ActionSemantics(ActionUsageAdapter usage) {
+    public SysMLV2ActionSemantics(IActionUsage usage) {
         this.actionDefinition = usage.getActionDefinition();
         this.nodeRegistry = new HashMap<>();
         
@@ -35,9 +34,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         }
         if (AdapterUtils.successions != null) {
             for (ISuccession succession : AdapterUtils.successions.values()) {
-                if (succession instanceof SuccessionAdapter sa) {
-                    sa.setExecutionContext(usage); 
-                }
+                    succession.setExecutionContext(usage); 
             }
         }
     }
@@ -50,7 +47,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
         
         if (actionDefinition != null && actionDefinition.getNodes() != null) {
         	for (INode node : actionDefinition.getNodes()) {
-                if (node instanceof ControlNodeAdapter && ((ControlNodeAdapter)node).isStartNode() ) {
+                if (node instanceof IControlNode && ((IControlNode)node).isStartNode()) {
                     System.out.println("  [!] StartNode reached: " + node.getID());
                     System.out.println("  [+] Succession produced: " + node.getOutgoings().getFirst().getID());
                     initialSuccessions.addAll(node.getOutgoings());

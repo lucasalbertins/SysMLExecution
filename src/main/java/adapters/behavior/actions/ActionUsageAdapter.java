@@ -8,7 +8,6 @@ import org.omg.sysml.lang.sysml.ActionUsage;
 import org.omg.sysml.lang.sysml.AssignmentActionUsage;
 import org.omg.sysml.lang.sysml.ControlNode;
 import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Expression;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FeatureDirectionKind;
 import org.omg.sysml.lang.sysml.FlowUsage;
@@ -16,6 +15,7 @@ import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.TerminateActionUsage;
 import org.omg.sysml.lang.sysml.TransitionUsage;
 
+import adapters.behavior.actions.nodes.AssignmentActionUsageAdapter;
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.FlowUsageAdapter;
 import adapters.behavior.actions.nodes.NodeAdapter;
@@ -24,13 +24,14 @@ import adapters.utils.StartNode;
 import adapters.utils.ParameterAdapter;
 import interfaces.behavior.actions.IActionDefinition;
 import interfaces.behavior.actions.IActionUsage;
+import interfaces.behavior.actions.IAssignmentActionUsage;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.structures.expressions.IExpression;
 import interfaces.utils.IParameter;
 
 public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
-	
+    
     private ActionDefinition rawDefinition;
     private IActionDefinition actionDefinitionAdapter;
     
@@ -45,13 +46,12 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
         ArrayList<INode> nodeList = new ArrayList<>();
         ArrayList<IFlow> flowList = new ArrayList<>();
         
-        
         if (actionUsage.getActionDefinition().getFirst() != null) {
             this.rawDefinition = (ActionDefinition) actionUsage.getActionDefinition().getFirst();
         }
         
         for (Element element : actionUsage.getOwnedMember()) {
-            // InitialNode/FinalNode via SuccessionAsUsage.
+        	// InitialNode/FinalNode via SuccessionAsUsage.
             if (element instanceof SuccessionAsUsage su) {
                 if ("start".equals(su.getSource().getFirst().getDeclaredName())) {
                     StartNode init = new StartNode();
@@ -70,9 +70,13 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
                     nodeList.add(new ControlNodeAdapter(fin));
                 }
             }
-            // ActionUsage (except TransitionUsage).
+            // ActionUsage + AssignmentActionUsage (except TransitionUsage)
             else if (element instanceof ActionUsage au && !(element instanceof TransitionUsage)) {
-                nodeList.add(new ActionUsageAdapter(au));
+                if (element instanceof AssignmentActionUsage aau) {
+                    nodeList.add(new AssignmentActionUsageAdapter(aau));
+                } else {
+                    nodeList.add(new ActionUsageAdapter(au));
+                }
             }
             // ActionUsage parameters.
             else if (element instanceof Feature f && f.getDirection() != null) {
@@ -81,7 +85,7 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
             // ControlNode
             else if (element instanceof ControlNode cn) {
                 nodeList.add(new ControlNodeAdapter(cn));
-            } 
+            }
             // FlowUsage
             else if (element instanceof FlowUsage fu) {
                 nodeList.add(new NodeAdapter(fu));
@@ -118,7 +122,7 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
     
     @Override
     public IExpression getArgument() {
-    	return null;
+        return null;
     }
 
     @Override
@@ -156,5 +160,16 @@ public class ActionUsageAdapter extends NodeAdapter implements IActionUsage {
     @Override
     public boolean isAssignmentActionNode() {
         return nodeElement instanceof AssignmentActionUsage;
+    }
+
+    @Override
+    public List<IAssignmentActionUsage> getNestedAssignments() {
+        List<IAssignmentActionUsage> assignments = new ArrayList<>();
+        for (INode n : nodes) {
+            if (n instanceof IAssignmentActionUsage assignNode) {
+                assignments.add(assignNode);
+            }
+        }
+        return assignments;
     }
 }

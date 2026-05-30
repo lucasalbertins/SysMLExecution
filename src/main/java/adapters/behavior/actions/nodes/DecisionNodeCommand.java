@@ -3,7 +3,6 @@ package adapters.behavior.actions.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import adapters.behavior.actions.SuccessionAdapter;
 import gamine.domain.SysMLV2Configuration;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.IFlow;
@@ -17,7 +16,7 @@ public class DecisionNodeCommand extends NodeCommand {
 
         for (ISuccession outgoing : node.getOutgoings()) {
             boolean isConditionMet = true;
-            if (outgoing instanceof SuccessionAdapter adapter) {
+            if (outgoing instanceof ISuccession adapter) {
                 isConditionMet = adapter.evaluateGuard();
             }
             

@@ -11,12 +11,9 @@ import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import gamine.SysMLV2ActionSemantics;
 import obp3.Sequencer;
-import obp3.sli.core.operators.SemanticRelation2RootedGraph;
-import obp3.traversal.dfs.DepthFirstTraversal;
 import obp3.sli.core.operators.ToDetermistic;
 
-public class DecisionNodeGamineTest {
-	
+public class AssignmentActionGamineTest {
 	private static SysMLV2Spec spec;
     private static Namespace rootNamespace;
     private static ActionUsageAdapterRegistry registry;
@@ -38,15 +35,6 @@ public class DecisionNodeGamineTest {
         return new SysMLV2ActionSemantics(usageAdapter);
     }
     
-//  @Test
-//  void testDFS() {
-//      var semantics = createSemantics("chargeBattery");
-//      var rootedGraph = new SemanticRelation2RootedGraph<>(semantics);
-//      var dfs = new DepthFirstTraversal<>(rootedGraph);
-//      var result = dfs.runAlone();
-//      System.out.println(result);
-//  }
-
     @Test
     void newTest() {
     	var semantics = createSemantics("chargeBattery");

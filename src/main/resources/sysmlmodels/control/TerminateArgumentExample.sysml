@@ -11,10 +11,13 @@ package TerminateActionsExample {
 		}
 	}
 
-	action terminateProcessing {
+	action def TerminateProcessing {
+		first start;
 		in processor : Processor;
 
-		terminate processor.workflowProcess;
-		terminate processor;
+		then terminate processor.workflowProcess;
+		then terminate processor;
 	}
+	
+	action terminateProcessing : TerminateProcessing;
 }

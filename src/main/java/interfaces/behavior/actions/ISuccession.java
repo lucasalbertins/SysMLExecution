@@ -6,11 +6,10 @@ import interfaces.utils.INamedElement;
 public interface ISuccession extends INamedElement {
 
 	public INode getTarget();
-
 	public INode getSource();
-	
-	void setSource(INode source);
-	
-    void setTarget(INode target);
+	public void setSource(INode source);
+    public void setTarget(INode target);
+    public void setExecutionContext(IActionUsage contextAdapter);
+    public boolean evaluateGuard();
 	// Maybe generic NamedElement (?)
 }

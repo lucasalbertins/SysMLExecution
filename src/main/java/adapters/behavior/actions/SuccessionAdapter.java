@@ -15,6 +15,7 @@ import org.omg.sysml.util.EvaluationUtil;
 
 import adapters.behavior.actions.nodes.ControlNodeAdapter;
 import adapters.behavior.actions.nodes.NodeAdapter;
+import interfaces.behavior.actions.IActionUsage;
 import interfaces.behavior.actions.ISuccession;
 import interfaces.behavior.actions.nodes.INode;
 
@@ -73,6 +74,7 @@ public class SuccessionAdapter implements ISuccession {
     }
 
     // Evaluates the guard autonomously.
+    @Override
     public boolean evaluateGuard() {
         Expression guardExpr = extractGuardExpression();
         if (guardExpr == null) {
@@ -91,7 +93,7 @@ public class SuccessionAdapter implements ISuccession {
         return false;
     }
     
-    private Expression extractGuardExpression() {
+    public Expression extractGuardExpression() {
         for (Element member : succession.getMember()) {
             if (member instanceof Expression e) return e;
         } 
@@ -101,7 +103,7 @@ public class SuccessionAdapter implements ISuccession {
             }
         }
         return null;
-   }
+    }
 
     public Element resolveContext() {
         Element current = succession.getOwner();
@@ -114,7 +116,8 @@ public class SuccessionAdapter implements ISuccession {
         return succession.getOwningNamespace(); 
     }
     
-    public void setExecutionContext(ActionUsageAdapter contextAdapter) {
+    @Override
+    public void setExecutionContext(IActionUsage contextAdapter) {
         if (contextAdapter != null) {
             // Uses the method inherited from NodeAdapter to retrieve the physical element.
             this.executionContext = contextAdapter.getElement();

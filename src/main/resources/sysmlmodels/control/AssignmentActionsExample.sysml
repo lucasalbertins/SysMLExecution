@@ -11,6 +11,7 @@ package AssignmentActionsExample {
 	
 		private attribute position := initialPosition;
 		private attribute speed := initialSpeed;
+		action def StraightLineDynamics;
 	
 		for vehiclePower in powerProfile {
 			perform action dynamics : StraightLineDynamics {
@@ -22,8 +23,7 @@ package AssignmentActionsExample {
 			}
 		then assign position := dynamics.x_out;
 		then assign speed := dynamics.v_out;
-		then assign positions := 
-			positions->including(position);
+		then assign positions := position; // positions->including(position)
 		}
 	}
 	action computeMotion : ComputeMotion;
