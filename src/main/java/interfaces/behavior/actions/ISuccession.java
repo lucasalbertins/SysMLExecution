@@ -12,4 +12,5 @@ public interface ISuccession extends INamedElement {
     public void setExecutionContext(IActionUsage contextAdapter);
     public boolean evaluateGuard();
 	// Maybe generic NamedElement (?)
+    
 }
