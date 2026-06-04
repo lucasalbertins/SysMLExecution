@@ -4,6 +4,5 @@ import interfaces.behavior.actions.nodes.INode;
 
 public interface IAssignmentActionUsage extends INode {
 	
-	void applyAssignment();
-	
+	public void applyAssignment();
 }

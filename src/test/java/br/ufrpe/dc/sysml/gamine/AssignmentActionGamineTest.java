@@ -21,9 +21,9 @@ public class AssignmentActionGamineTest {
     @BeforeAll
     static void init() {
         spec = new SysMLV2Spec();
-        spec.parseFile("control/NewDecisionNodeExample.sysml");
+        spec.parseFile("control/AssignmentActionsExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
-        System.out.println("NewDecisionNodeExample.sysml loaded");
+        System.out.println("AssignmentActionsExample.sysml loaded");
         assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
         assertNotNull(registry, "Registry cannot be null.");
@@ -37,7 +37,7 @@ public class AssignmentActionGamineTest {
     
     @Test
     void newTest() {
-    	var semantics = createSemantics("chargeBattery");
+    	var semantics = createSemantics("computeMotion");
         var deterministic = ToDetermistic.randomPolicy(semantics, System.nanoTime());
         var sequencer = new Sequencer<>(deterministic);
         int[] count = new int[]{30};

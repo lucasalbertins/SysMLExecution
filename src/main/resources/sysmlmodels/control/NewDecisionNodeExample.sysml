@@ -10,7 +10,8 @@ package NewDecisionExample {
     part def Part1;
 
     part device : Device {
-        out attribute battery : Real = 50.0;
+        out attribute battery : Real = 30.0;
+        out attribute isCharging : Boolean = true;
 
         action def ChargeBattery {
             first start;
@@ -26,11 +27,13 @@ package NewDecisionExample {
 
             action addCharge : AddCharge {
                 in charge = monitor.batteryCharge;
-                assign device.battery := device.battery * 2 - 15;
+                assign device.battery := device.battery * 3 - 40;
             }
             then continueCharging;
 
-            action endCharging : EndCharging;
+            action endCharging : EndCharging {
+            	assign device.isCharging := true;
+            }
             then done;
         }
     }
