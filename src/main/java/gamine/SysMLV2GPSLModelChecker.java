@@ -64,7 +64,6 @@ public class SysMLV2GPSLModelChecker {
 
         try {
             StandardEvaluationContext context = new StandardEvaluationContext(config);
-            // Acopla a classe externa
             context.addPropertyAccessor(propertyAccessor);
 
             Boolean result = parser.parseExpression(atom).getValue(context, Boolean.class);

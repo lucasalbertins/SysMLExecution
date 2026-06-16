@@ -34,10 +34,6 @@ public class SysMLV2GPSLModelCheckerTest {
         return new SysMLV2GPSLModelChecker(ua, rootNamespace);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 1. SAFETY PROPERTIES: "Algo ruim NUNCA acontece"
-    // Operadores: [] (Sempre) ou G (Globally)
-    // ─────────────────────────────────────────────────────────────────────────
     @Nested
     @DisplayName("Safety Properties (Globally / [])")
     class SafetyProperties {
@@ -58,10 +54,6 @@ public class SysMLV2GPSLModelCheckerTest {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 2. LIVENESS PROPERTIES: "Algo bom EVENTUALMENTE acontece"
-    // Operadores: <> (Eventualmente) ou F (Future)
-    // ─────────────────────────────────────────────────────────────────────────
     @Nested
     @DisplayName("Liveness Properties (Eventually / <>)")
     class LivenessProperties {
@@ -76,16 +68,11 @@ public class SysMLV2GPSLModelCheckerTest {
         @Test
         @DisplayName("A bateria eventualmente atinge a carga total")
         void batteryEventuallyFull() {
-            // F (Future) avaliando uma expressão condicional composta no SpEL
             var result = gpslChecker("chargeBattery").check("p =! F (|battery >= 100.0| && |isCharging == false|)");
             assertTrue(result.holds(), "O sistema deve chegar a um estado onde a bateria está cheia e não está mais carregando.");
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // 3. CAUSALITY & UNTIL PROPERTIES: Condições ao longo do tempo
-    // Operadores: W (Weak Until), U (Strong Until), -> (Implies)
-    // ─────────────────────────────────────────────────────────────────────────
+    
     @Nested
     @DisplayName("Causality Properties (Until / Implies)")
     class CausalityProperties {
@@ -93,7 +80,6 @@ public class SysMLV2GPSLModelCheckerTest {
         @Test
         @DisplayName("A bateria permanece <= 100 até que o carregamento termine")
         void batteryStateUntilChargingStops() {
-            // W (Weak Until): p se mantém verdadeiro até que q seja verdadeiro
             var result = gpslChecker("chargeBattery").check("p =! |battery <= 100.0| W |isCharging == false|");
             assertTrue(result.holds(), "A bateria deve respeitar o limite ATÉ o carregamento ser desligado.");
         }
@@ -101,11 +87,7 @@ public class SysMLV2GPSLModelCheckerTest {
         @Test
         @DisplayName("Se a bateria chegar em 110.0, implica que eventualmente o carregamento será desligado")
         void implicationTest() {
-            // [] (p -> <> q) : Sempre que p for verdade, q deve ser verdade no futuro (ou no mesmo instante)
             var result = gpslChecker("chargeBattery").check("p =! [] (|battery == 110.0| -> <> |isCharging == false|)");
-            
-            // Note o '-> <>' na string. Isso permite que o SysML caminhe pelos nós de Merge e Decision 
-            // antes de finalmente alcançar o nó 'endCharging'.
             assertTrue(result.holds(), "Ao atingir 110.0, o fluxo deve obrigatoriamente levar ao desligamento.");
         }
     }
