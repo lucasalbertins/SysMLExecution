@@ -18,6 +18,8 @@ public class AssignmentActionUsageAdapter extends NodeAdapter implements IAssign
 
     private Feature referent;
     private Expression valueExpression;
+    
+    private Object lastAssignedValue; 
 
     public AssignmentActionUsageAdapter(AssignmentActionUsage aau) {
         super(aau);
@@ -26,14 +28,13 @@ public class AssignmentActionUsageAdapter extends NodeAdapter implements IAssign
     }
 
     public Feature getReferent() { 
-    	return referent; 
+        return referent; 
     }
     
     public Expression getValueExpression() { 
-    	return valueExpression; 
+        return valueExpression; 
     }
 
-    // Replicated from SuccessionAdapter
     public Element resolveContext() {
         Element current = getElement().getOwner();
         while (current != null) {
@@ -58,20 +59,23 @@ public class AssignmentActionUsageAdapter extends NodeAdapter implements IAssign
 
     @Override
     public void applyAssignment() {
-        if (referent == null || valueExpression == null) return; // exception
+        if (referent == null || valueExpression == null) return; 
         try {
             Element context = resolveContext();
             Object newValue = evaluateGeneric(valueExpression, context);
+            
+            this.lastAssignedValue = newValue;
+
             Expression finalExpr = (Expression) EvaluationUtil.elementFor(newValue);
             FeatureValue existing = FeatureUtil.getValuationFor(referent);
-            if (existing != null) { // exception
+            if (existing != null) { 
                 referent.getOwnedRelationship().remove(existing);
             }
             FeatureUtil.addFeatureValueTo(referent, finalExpr);
             System.out.printf("  [Assign] '%s' := %s%n", referent.getDeclaredName(), newValue);
         } catch (Exception e) {
             System.err.printf("  [Assign] ERROR evaluating '%s': %s%n",
-            		referent.getDeclaredName(), e.getMessage());
+                    referent.getDeclaredName(), e.getMessage());
         }
     }
 
@@ -79,5 +83,20 @@ public class AssignmentActionUsageAdapter extends NodeAdapter implements IAssign
     public String getDeclaredName() {
         String refName = referent != null ? referent.getDeclaredName() : "?";
         return "assign " + refName;
+    }
+
+    @Override
+    public String getTargetName() {
+        return referent != null ? referent.getDeclaredName() : null;
+    }
+
+    @Override
+    public String getTargetID() {
+        return referent != null ? referent.getElementId() : null;
+    }
+
+    @Override
+    public Object getCurrentValue() {
+        return lastAssignedValue;
     }
 }

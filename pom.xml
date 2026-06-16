@@ -28,25 +28,41 @@
 	<properties>
 		<java.version>23</java.version>
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
-		<sysml.version>0.56.0-SNAPSHOT</sysml.version> 
+		<sysml.version>0.56.0-SNAPSHOT</sysml.version>
 	</properties>
 	<repositories>
-    <repository>
-        <id>github-sysml</id>
-        <url>https://maven.pkg.github.com/Systems-Modeling/SysML-v2-Pilot-Implementation</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
+   <repository>
+       <id>github-sysml</id>
+       <url>https://maven.pkg.github.com/Systems-Modeling/SysML-v2-Pilot-Implementation</url>
+       <snapshots>
+           <enabled>true</enabled>
+       </snapshots>
+   </repository>
 	<repository>
-        <id>github-obp3</id>
-        <url>https://maven.pkg.github.com/plug-obp/obp3-core</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
+       <id>github-obp3</id>
+       <url>https://maven.pkg.github.com/plug-obp/obp3-core/</url>
+       <snapshots>
+           <enabled>true</enabled>
+       </snapshots>
+   </repository>
+  
+   <repository>
+       <id>github-gpsl-java</id>
+       <url>https://maven.pkg.github.com/plug-obp/gpsl-java/</url>
+       <snapshots>
+           <enabled>true</enabled>
+       </snapshots>
+   </repository>
+  
+   <repository>
+       <id>github-rege-java</id>
+       <url>https://maven.pkg.github.com/plug-obp/rege-java/</url>
+       <snapshots>
+           <enabled>true</enabled>
+       </snapshots>
+   </repository>
+  
 </repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -148,19 +164,34 @@
 			<version>${sysml.version}</version>
 		</dependency>
 		<dependency>
-  			<groupId>org.omg.sysml</groupId>
-  			<artifactId>org.omg.sysml.interactive</artifactId>
-  			<version>${sysml.version}</version>
+ 			<groupId>org.omg.sysml</groupId>
+ 			<artifactId>org.omg.sysml.interactive</artifactId>
+ 			<version>${sysml.version}</version>
 		</dependency>
 			<dependency>
-  			<groupId>org.obpcdl</groupId>
-  			<artifactId>obp3-runtime</artifactId>
-  			<version>1.0.0-main.39+1681ef1</version>
+ 			<groupId>org.obpcdl</groupId>
+ 			<artifactId>obp3-runtime</artifactId>
+ 			<version>1.0.0-main.39+1681ef1</version>
 		</dependency>
 		<dependency>
-  			<groupId>org.obpcdl</groupId>
-  			<artifactId>obp3-algos</artifactId>
-  			<version>1.0.0-main.39+1681ef1</version>
+ 			<groupId>org.obpcdl</groupId>
+ 			<artifactId>obp3-algos</artifactId>
+ 			<version>1.0.0-main.39+1681ef1</version>
+		</dependency>
+		<dependency>
+ 			<groupId>org.obpcdl</groupId>
+ 			<artifactId>gpsl-modelchecker</artifactId>
+ 			<version>1.1.0-main.97+1b5145b</version>
+		</dependency>
+		<dependency>
+ 			<groupId>org.obpcdl</groupId>
+ 			<artifactId>gpsl-core</artifactId>
+ 			<version>1.1.0-main.97+1b5145b</version>
+		</dependency>
+		<dependency>
+ 			<groupId>org.obpcdl</groupId>
+ 			<artifactId>reader-infra</artifactId>
+ 			<version>1.1.0-main.25+76b8cad</version>
 		</dependency>
 	</dependencies>
 	
@@ -175,7 +206,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<build>
 		<plugins>
 			<plugin>

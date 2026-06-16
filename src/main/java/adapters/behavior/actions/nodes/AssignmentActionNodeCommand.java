@@ -13,6 +13,19 @@ public class AssignmentActionNodeCommand extends ActionNodeCommand {
         if (node instanceof IAssignmentActionUsage assignmentNode) {
             assignmentNode.applyAssignment();
         }
-        return super.execute(node, configuration);
+        List<SysMLV2Configuration> nextConfigs = super.execute(node, configuration);
+        
+        if (node instanceof IAssignmentActionUsage assignmentNode) {
+            for (SysMLV2Configuration nextConfig : nextConfigs) {
+                String varName = assignmentNode.getTargetName();
+                Object varValue = assignmentNode.getCurrentValue();
+                
+                if (varName != null && varValue != null) {
+                    nextConfig.memory.put(varName, varValue);
+                }
+            }
+        }
+        
+        return nextConfigs;
     }
 }

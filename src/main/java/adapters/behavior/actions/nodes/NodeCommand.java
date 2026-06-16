@@ -51,7 +51,12 @@ public abstract class NodeCommand implements INodeCommand {
         removeIncomingFlows(node, nextFlows);
         addOutgoingFlows(node, nextFlows);
         
-        return List.of(new SysMLV2Configuration(nextSuccessions, nextFlows));
+        // We transfer copy of the current memory
+        return List.of(new SysMLV2Configuration(
+                nextSuccessions, 
+                nextFlows, 
+                new java.util.HashMap<>(configuration.memory)
+        ));
     }
 
     protected void removeIncomings(INode node, List<ISuccession> nextSuccessions) {

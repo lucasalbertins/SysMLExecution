@@ -10,7 +10,7 @@ import interfaces.behavior.actions.nodes.INode;
 
 public class DecisionNodeCommand extends NodeCommand {
 
-    @Override
+	@Override
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
         List<SysMLV2Configuration> possibleNextStates = new ArrayList<>();
 
@@ -31,7 +31,13 @@ public class DecisionNodeCommand extends NodeCommand {
                 addOutgoingFlows(node, nextFlows);
                 
                 System.out.printf("  [o] Path allowed.\n  [+] Succession produced: %s%n", outgoing.getID());
-                possibleNextStates.add(new SysMLV2Configuration(nextSuccessions, nextFlows));
+                
+                // We transfer copy of the current memory
+                possibleNextStates.add(new SysMLV2Configuration(
+                        nextSuccessions, 
+                        nextFlows, 
+                        new java.util.HashMap<>(configuration.memory)
+                ));
             } else {
                 System.out.printf("  [x] Path blocked by guard: %s%n", outgoing.getID());
             }
