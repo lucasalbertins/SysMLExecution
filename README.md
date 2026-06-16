@@ -44,14 +44,22 @@ To download **SysML v2** and **OBP3** dependencies, Maven must be configured to 
             <username>YOUR_GITHUB_USER</username>
             <password>YOUR_GITHUB_TOKEN</password>
         </server>
-
         <server>
             <id>github-obp3</id>
             <username>YOUR_GITHUB_USER</username>
             <password>YOUR_GITHUB_TOKEN</password>
         </server>
+        <server>
+            <id>github-gpsl-java</id>
+            <username>YOUR_GITHUB_USER</username>
+            <password>YOUR_GITHUB_TOKEN</password>
+        </server>
+        <server>
+            <id>github-rege-java</id>
+            <username>YOUR_GITHUB_USER</username>
+            <password>YOUR_GITHUB_TOKEN</password>
+        </server>
     </servers>
-
 </settings>
 ```
 
