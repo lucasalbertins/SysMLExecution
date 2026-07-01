@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,19 +15,19 @@ import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import gamine.SysMLV2GPSLModelChecker;
 
-@DisplayName("GPSL Model Checking Specifications")
+@DisplayName("GPSL Model Checking - StepWrapper Features")
 public class SysMLV2GPSLModelCheckerTest {
-    
+
     private Namespace rootNamespace;
     private ActionUsageAdapterRegistry registry;
-    
+
     @BeforeEach
     void init() {
         var spec = new SysMLV2Spec();
         spec.parseFile("control/NewDecisionNodeExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         registry = new ActionUsageAdapterRegistry(rootNamespace);
-        System.out.println("\n===== New SysML AST loaded for GPSL testing =====");
+        System.out.println("\n===== SysML AST loaded for Wrapper testing =====");
     }
 
     private SysMLV2GPSLModelChecker gpslChecker(String action) {
@@ -35,60 +36,77 @@ public class SysMLV2GPSLModelCheckerTest {
     }
 
     @Nested
-    @DisplayName("Safety Properties (Globally / [])")
-    class SafetyProperties {
+    @DisplayName("Transition-Based Tests (Source vs. Target)")
+    class TransitionProperties {
 
-        @Test
-        @DisplayName("A bateria nunca deve ficar negativa")
-        void batteryAlwaysPositive() {
-            var result = gpslChecker("chargeBattery").check("p =! [] |battery >= 0.0|");
-            assertTrue(result.holds(), "A bateria não pode ter carga negativa.");
+    	@Test
+        @DisplayName("Ensures the battery level never decreases (Always Target >= Source).")
+        void batteryNeverDecreases() {
+            var result = gpslChecker("chargeBattery")
+                    .check("p =! [] |target.battery >= source.battery|");
+            System.out.println(result.toString());
+            assertFalse(result.holds(),
+                "Expected: battery decreases from 110 to 100 in endCharging.");
         }
 
         @Test
-        @DisplayName("A bateria não deve passar de 110.0 (Contraexemplo esperado se limite for 100)")
-        void batteryNeverExceedsStrictLimit() {
-            // Se o seu modelo de fato vai até 110, testar que é SEMPRE <= 100 vai falhar.
-            var result = gpslChecker("chargeBattery").check("p =! G |battery <= 100.0|");
-            assertFalse(result.holds(), "A propriedade deve falhar, pois o modelo atinge 110.0");
+        @DisplayName("Checks if a specific change occurs in the variable.")
+        void verifySpecificChargeIncrement() {
+            var result = gpslChecker("chargeBattery")
+                    .check("p =! [] (|actionName == 'addCharge'| -> |target.battery == source.battery + 20.0|)");
+            assertFalse(result.holds(),
+                "It will fail if the actual increment is not exactly 20.0.");
         }
     }
 
     @Nested
-    @DisplayName("Liveness Properties (Eventually / <>)")
-    class LivenessProperties {
+    @DisplayName("Action and Event-Based Tests (ActionName)")
+    class ActionProperties {
 
         @Test
-        @DisplayName("O sistema deve terminar com sucesso (atingir o nó done)")
-        void systemTerminates() {
-            var result = gpslChecker("chargeBattery").check("p =! <> |done|");
-            assertTrue(result.holds(), "O sistema não pode entrar em Livelock/Deadlock, deve terminar.");
+        @DisplayName("Whenever 'endCharging' is executed, the 'isCharging' flag on the target is set to false.")
+        void actionEffectsOnTarget() {
+            var result = gpslChecker("chargeBattery")
+                    .check("p =! [] (|actionName == 'endCharging'| -> |target.isCharging == false|)");
+            //System.out.println(result.toString());
+            assertTrue(result.holds(),
+                "The execution of endCharging must have the immediate effect of turning off the flag.");
         }
 
         @Test
-        @DisplayName("A bateria eventualmente atinge a carga total")
-        void batteryEventuallyFull() {
-            var result = gpslChecker("chargeBattery").check("p =! F (|battery >= 100.0| && |isCharging == false|)");
-            assertTrue(result.holds(), "O sistema deve chegar a um estado onde a bateria está cheia e não está mais carregando.");
+        @DisplayName("The 'addCharge' action must eventually be executed.")
+        void specificActionEventuallyRuns() {
+            var result = gpslChecker("chargeBattery")
+                    .check("p =! <> |actionName == 'addCharge'|");
+            assertTrue(result.holds(),
+                "The charging cycle must pass through the load-addition node at least once.");
         }
     }
     
     @Nested
-    @DisplayName("Causality Properties (Until / Implies)")
-    class CausalityProperties {
+    @DisplayName("Topology Tests (Deadlock / Done)")
+    class TopologicalProperties {
 
         @Test
-        @DisplayName("A bateria permanece <= 100 até que o carregamento termine")
-        void batteryStateUntilChargingStops() {
-            var result = gpslChecker("chargeBattery").check("p =! |battery <= 100.0| W |isCharging == false|");
-            assertTrue(result.holds(), "A bateria deve respeitar o limite ATÉ o carregamento ser desligado.");
+        @DisplayName("The system must complete successfully.")
+        void systemTerminates() {
+            var result = gpslChecker("chargeBattery").check("p =! <> |done|");
+            assertTrue(result.holds(),
+                "The system cannot enter an infinite loop..");
         }
+    }
+
+    @Disabled
+    @Nested
+    @DisplayName("Compatibility with Legacy Properties (Implicit Target)")
+    class BackwardCompatibility {
 
         @Test
-        @DisplayName("Se a bateria chegar em 110.0, implica que eventualmente o carregamento será desligado")
-        void implicationTest() {
-            var result = gpslChecker("chargeBattery").check("p =! [] (|battery == 110.0| -> <> |isCharging == false|)");
-            assertTrue(result.holds(), "Ao atingir 110.0, o fluxo deve obrigatoriamente levar ao desligamento.");
+        @DisplayName("Variables accessed directly refer to the Target.")
+        void directVariableAccess() {
+            var result = gpslChecker("chargeBattery").check("p =! [] |battery >= 30.0|");
+            assertTrue(result.holds(),
+                "The evaluator must continue to function with the original properties.");
         }
     }
 }

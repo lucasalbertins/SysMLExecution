@@ -20,12 +20,15 @@ public class SysMLV2GPSLModelChecker {
     private final ExpressionParser parser = new SpelExpressionParser();
     private final SysMLV2PropertyAccessor propertyAccessor;
 
-    public record VerificationResult(boolean holds, String trace) {
+    // A wrapper to facilitate the complete transition to Spring
+    public record StepWrapper(SysMLV2Configuration source, INode action, SysMLV2Configuration target) {}
+
+    public record VerificationResult(boolean holds, int steps, String trace) {
         @Override
         public String toString() {
             return holds
-                ? "✓ Property holds."
-                : "✗ Counterexample found:\n" + trace;
+                ? "✓ Property holds (" + steps + " steps explored)."
+                : "✗ Counterexample found (Length: " + steps + " steps):\n" + trace;
         }
     }
 
@@ -40,35 +43,51 @@ public class SysMLV2GPSLModelChecker {
                 this::evaluateStep,
                 gpslProperty
         );
+
         EmptinessCheckerAnswer<Product<SysMLV2Configuration, State>> answer =
                 checker.modelChecker().runAlone();
-        
-        boolean propertyHolds = answer.holds; 
 
+        int steps = answer.trace != null ? answer.trace.size() : 0;
         StringBuilder sb = new StringBuilder();
-        if (!propertyHolds && answer.trace != null) {
-            for (Product<SysMLV2Configuration, State> passo : answer.trace) {
-                sb.append("  -> ").append(passo.l().toString()).append("\n");
+        
+        if (!answer.holds && answer.trace != null) {
+            int stepIndex = 0;
+            for (var passo : answer.trace) {
+                var config = passo.l(); // SysMLV2Configuration
+                sb.append("  [Step ").append(stepIndex++).append("] ");
+                if (!config.memory.isEmpty()) {
+                    sb.append(" Memory: ").append(config.memory);
+                }
+                sb.append("\n");
             }
         }
-        return new VerificationResult(propertyHolds, sb.toString());
+        return new VerificationResult(answer.holds, steps, sb.isEmpty() ? "—" : sb.toString());
     }
 
     private boolean evaluateStep(String atom, Step<INode, SysMLV2Configuration> step) {
+        
         atom = atom.trim();
-        SysMLV2Configuration config = step.end() != null ? step.end() : step.start();
+        SysMLV2Configuration startConfig = step.start();
+        SysMLV2Configuration targetConfig = step.end() != null ? step.end() : step.start();
+        INode actionNode = step.action().orElse(null);
 
+        // Topological validation
         if ("done".equals(atom) || "deadlock".equals(atom)) {
-            return config.successions.isEmpty() && config.flows.isEmpty();
+            return targetConfig.successions.isEmpty() && targetConfig.flows.isEmpty();
         }
 
         try {
-            StandardEvaluationContext context = new StandardEvaluationContext(config);
+            // We encapsulate the transition in an object containing source, target, and action.
+            StepWrapper rootObject = new StepWrapper(startConfig, actionNode, targetConfig);
+            
+            // The context now originates from the Wrapper, not just the final target.
+            StandardEvaluationContext context = new StandardEvaluationContext(rootObject);
             context.addPropertyAccessor(propertyAccessor);
 
             Boolean result = parser.parseExpression(atom).getValue(context, Boolean.class);
             return result != null && result;
         } catch (Exception e) {
+            System.err.println("[SpEL ERROR] Failed to evaluate '" + atom + "': " + e.getMessage());
             return false; 
         }
     }
