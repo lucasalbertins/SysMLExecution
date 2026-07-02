@@ -21,7 +21,7 @@ package NewDecisionExample {
                assign batteryCharge := device.battery;
            }
            
-           then decide decision1;
+           then decide decision;
                if monitor.batteryCharge < 100.0 then addCharge;
                if monitor.batteryCharge >= 100.0 then endCharging;
                
