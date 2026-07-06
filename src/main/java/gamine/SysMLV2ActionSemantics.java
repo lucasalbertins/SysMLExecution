@@ -20,19 +20,19 @@ import obp3.runtime.sli.SemanticRelation;
 
 public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Configuration> {
 
-    private final IActionDefinition actionDefinition;
-    private final Map<String, INode> nodeRegistry;
-    private final Map<String, Object> initialMemory;
+    private IActionDefinition actionDefinition;
+    private Map<String, INode> nodeRegistry;
+    private Map<String, Object> initialMemory;
 
     public SysMLV2ActionSemantics(IActionUsage usage) {
         this(usage, new HashMap<>());
     }
 
-    // Phase 2 constructor: initialMemory collected externally by whoever has Namespace access
+    // initialMemory collected externally by whoever has Namespace access
     public SysMLV2ActionSemantics(IActionUsage usage, Map<String, Object> initialMemory) {
         this.actionDefinition = usage.getActionDefinition();
-        this.nodeRegistry     = new HashMap<>();
-        this.initialMemory    = initialMemory != null ? initialMemory : new HashMap<>();
+        this.nodeRegistry = new HashMap<>();
+        this.initialMemory = initialMemory != null ? initialMemory : new HashMap<>();
 
         if (actionDefinition != null && actionDefinition.getNodes() != null) {
             for (INode node : actionDefinition.getNodes()) {
@@ -62,7 +62,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
             }
         }
 
-        // Phase 2: every path starts with a complete snapshot of initial variable values
+        // Every path starts with a complete snapshot of initial variable values
         return List.of(new SysMLV2Configuration(
                 initialSuccessions,
                 initialFlows,
