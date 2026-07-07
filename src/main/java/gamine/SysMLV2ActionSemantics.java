@@ -23,7 +23,8 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
     private IActionDefinition actionDefinition;
     private Map<String, INode> nodeRegistry;
     private Map<String, Object> initialMemory;
-
+    private Map<String, IActionUsage> currentActionUsages;
+    
     public SysMLV2ActionSemantics(IActionUsage usage) {
         this(usage, new HashMap<>());
     }
@@ -113,10 +114,25 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
     public List<SysMLV2Configuration> execute(INode node, SysMLV2Configuration configuration) {
         if (node != null) {
             INodeCommand command = NodeCommandFactory.create(node);
-            System.out.println("\n[Execute] Executing " +
-                    command.getClass().getSimpleName().replace("Command", "")
-                    + ": " + node.getDeclaredName());
-            return command.execute(node, configuration);
+            String nodeType = command.getClass().getSimpleName().replace("Command", "");
+            System.out.println("\n[Execute] Executing " + nodeType + ": " + node.getDeclaredName());
+            
+            List<SysMLV2Configuration> results = command.execute(node, configuration);
+            
+            // Automatically resolve and register subactions
+            if (node instanceof IActionUsage actionUsage) {
+                IActionDefinition actionDef = actionUsage.getActionDefinition();
+                if (actionDef != null) {
+                    for (SysMLV2Configuration result : results) {
+                        result.registerSubaction(node.getID(), actionUsage, actionDef);
+                        // Log for debugging
+                        System.out.println("  [SUBACTION] Registered: " + node.getDeclaredName() 
+                            + " -> " + actionDef.getDeclaredName());
+                    }
+                }
+            }
+            
+            return results;
         }
         return List.of(configuration);
     }
