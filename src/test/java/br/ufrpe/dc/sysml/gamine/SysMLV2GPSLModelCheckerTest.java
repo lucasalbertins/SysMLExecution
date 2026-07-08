@@ -15,7 +15,6 @@ import adapters.behavior.actions.ActionUsageAdapterRegistry;
 import br.ufrpe.dc.sysml.SysMLV2Spec;
 import gamine.SysMLV2GPSLModelChecker;
 
-@DisplayName("GPSL Model Checking - StepWrapper Features")
 public class SysMLV2GPSLModelCheckerTest {
 
     private Namespace rootNamespace;
@@ -24,7 +23,7 @@ public class SysMLV2GPSLModelCheckerTest {
     @BeforeEach
     void init() {
         var spec = new SysMLV2Spec();
-        spec.parseFile("control/NewDecisionNodeExample.sysml");
+        spec.parseFile("control/BatteryExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         registry = new ActionUsageAdapterRegistry(rootNamespace);
         System.out.println("\n===== SysML AST loaded for Wrapper testing =====");
@@ -50,7 +49,7 @@ public class SysMLV2GPSLModelCheckerTest {
                 "Expected: battery decreases from 110 to 100 in endCharging.");
         }
 
-    	@Disabled
+    	
         @Test
         @DisplayName("Checks if a specific change occurs in the variable.")
         void verifySpecificChargeIncrement() {
@@ -77,7 +76,7 @@ public class SysMLV2GPSLModelCheckerTest {
                 "The execution of endCharging must have the immediate effect of turning off the flag.");
         }
 
-        @Disabled
+    	@Disabled
         @Test
         @DisplayName("The 'addCharge' action must eventually be executed.")
         void specificActionEventuallyRuns() {
@@ -89,11 +88,11 @@ public class SysMLV2GPSLModelCheckerTest {
         }
     }
     
-    @Disabled
     @Nested
     @DisplayName("Topology Tests (Deadlock / Done)")
     class TopologicalProperties {
 
+    	@Disabled
         @Test
         @DisplayName("The system must complete successfully.")
         void systemTerminates() {

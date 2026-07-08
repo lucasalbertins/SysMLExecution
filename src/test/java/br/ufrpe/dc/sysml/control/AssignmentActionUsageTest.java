@@ -24,7 +24,7 @@ public class AssignmentActionUsageTest {
 	@BeforeAll
     static void init() throws IOException {
         spec = new SysMLV2Spec();
-        spec.parseFile("control/NewDecisionNodeExample.sysml");
+        spec.parseFile("control/BatteryExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         assertNotNull(rootNamespace, "The root namespace must not be null.");
     }

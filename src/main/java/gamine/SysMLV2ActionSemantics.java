@@ -50,7 +50,7 @@ public class SysMLV2ActionSemantics implements SemanticRelation<INode, SysMLV2Co
     public List<SysMLV2Configuration> initial() {
         System.out.println("\n[Initial] Searching initial state.");
         List<ISuccession> initialSuccessions = new ArrayList<>();
-        List<IFlow>       initialFlows       = new ArrayList<>();
+        List<IFlow> initialFlows = new ArrayList<>();
 
         if (actionDefinition != null && actionDefinition.getNodes() != null) {
             for (INode node : actionDefinition.getNodes()) {

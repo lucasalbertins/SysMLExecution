@@ -27,24 +27,30 @@ public class SysMLV2GPSLModelChecker {
 
     public record StepWrapper(
             SysMLV2Configuration source,
-            INode                action,
+            INode action,
             SysMLV2Configuration target) {}
 
-    public record VerificationResult(boolean holds, int steps, String trace) {
+    public record VerificationResult(boolean holds, int steps, String witness, String trace) {
         @Override public String toString() {
-            return holds
-                ? "✓ Property holds (" + steps + " transitions explored)."
-                : "✗ Counterexample found (Length: " + steps + " transitions):\n" + trace;
+            if (holds) {
+                return "✓ property holds.";
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("✗ counterexample at step ").append(steps).append(": ").append(witness);
+                if (trace != null && !trace.isEmpty()) {
+                    sb.append("\n").append(trace);
+                }
+                return sb.toString();
+            }
         }
     }
 
     public SysMLV2GPSLModelChecker(ActionUsageAdapter usage, Namespace root) {
         Map<String, Object> initialMemory = collectInitialMemory(root);
-        this.semantics        = new SysMLV2ActionSemantics(usage, initialMemory);
+        this.semantics = new SysMLV2ActionSemantics(usage, initialMemory);
         this.propertyAccessor = new SysMLV2PropertyAccessor(root);
     }
 
-    // Captures the initial state, filtering out raw AST objects to avoid log clutter.
     private static Map<String, Object> collectInitialMemory(Namespace root) {
         Map<String, Object> mem = new HashMap<>();
         if (root != null) collectFromElement(root, mem);
@@ -59,7 +65,6 @@ public class SysMLV2GPSLModelChecker {
             Expression expr = FeatureUtil.getValueExpressionFor(f);
             if (expr != null) {
                 Object val = EvaluationUtil.valueOf(expr);
-                // Only adds if it is a real value (ignores complex EMF/SysML objects)
                 if (val != null && !(val instanceof Element)) {
                     mem.put(f.getDeclaredName(), val);
                 }
@@ -78,61 +83,104 @@ public class SysMLV2GPSLModelChecker {
                 checker.modelChecker().runAlone();
 
         int statesCount = answer.trace != null ? answer.trace.size() : 0;
-        int transitions = Math.max(0, statesCount - 1); // Actual number of transitions (Steps)
-        StringBuilder sb = new StringBuilder();
+        int realSteps = 0;
+        if (answer.trace != null) {
+            for (int i = 0; i < statesCount - 1; i++) {
+                var src = answer.trace.get(i).l();
+                var tgt = answer.trace.get(i + 1).l();
+                if (src.successions.isEmpty() && src.flows.isEmpty() && 
+                    tgt.successions.isEmpty() && tgt.flows.isEmpty()) {
+                    break;
+                }
+                realSteps++;
+            }
+        }
 
+        StringBuilder sb = new StringBuilder();
+        int violationStep = realSteps;
+        String witnessMsg = null;
         if (!answer.holds && answer.trace != null) {
+            // Clears the GPSL prefix for display.
+            String prop = gpslProperty.replaceFirst("^p\\s*=\\s*!\\s*", "").trim();
+            witnessMsg = "'" + prop + "' was violated.";
+
+            // Locates the counterexample step.
+            for (int i = 1; i <= realSteps; i++) {
+                State autState = answer.trace.get(i).r();
+                if (autState != null && autState.name().toLowerCase().contains("accept")) {
+                    violationStep = i - 1;
+                    break;
+                }
+            }
+
             if (statesCount == 1) {
-                // Extreme case: it failed right at the first state, unable to transition.
                 var config = answer.trace.get(0).l();
-                sb.append("  [Estado Inicial / Deadlock]\n");
+                sb.append("  [Initial State / Deadlock]\n");
                 sb.append("    ↳ Tokens: [").append(getTokensStr(config)).append("]");
                 sb.append(formatMemory(config.memory)).append("\n");
             } else {
-                // Prints, grouping State (i) as Source and State (i+1) as Target.
                 for (int i = 0; i < statesCount - 1; i++) {
                     var sourceConfig = answer.trace.get(i).l();
                     var targetConfig = answer.trace.get(i + 1).l();
-                    
+
+                    // step stutter removal
+                    if (sourceConfig.successions.isEmpty() && targetConfig.successions.isEmpty() 
+                        && sourceConfig.flows.isEmpty() && targetConfig.flows.isEmpty()) {
+                        continue;
+                    }
+
+                    String actionName = "unknown / internal";
+                    for (var srcSucc : sourceConfig.successions) {
+                        // If the sequence was in the source but isn't in the target, it was consumed.
+                        boolean wasConsumed = targetConfig.successions.stream()
+                                .noneMatch(tgtSucc -> tgtSucc.getID().equals(srcSucc.getID()));
+                        
+                        if (wasConsumed && srcSucc.getTarget() != null) {
+                            INode actionNode = srcSucc.getTarget();
+                            actionName = actionNode.getDeclaredName() != null 
+                                            ? actionNode.getDeclaredName() 
+                                            : actionNode.getClass().getSimpleName();
+                            break;
+                        }
+                    }
                     sb.append("  [Step ").append(i).append("]\n");
                     sb.append("    ↳ Source: [").append(getTokensStr(sourceConfig)).append("]");
                     sb.append(formatMemory(sourceConfig.memory)).append("\n");
-                    
+                    sb.append("    ↳ Action: ").append(actionName).append("\n");
                     sb.append("    ↳ Target: [").append(getTokensStr(targetConfig)).append("]");
-                    sb.append(formatMemory(targetConfig.memory)).append("\n\n");
+                    sb.append(formatMemory(targetConfig.memory)).append("\n");
+                    if (i < realSteps - 1) sb.append("\n");
                 }
             }
         }
 
-        return new VerificationResult(answer.holds, transitions, sb.isEmpty() ? "—" : sb.toString());
+        int finalSteps = answer.holds ? realSteps : violationStep;
+        return new VerificationResult(answer.holds, finalSteps, witnessMsg, sb.isEmpty() ? "" : sb.toString());
     }
-    
+
     private String getTokensStr(SysMLV2Configuration config) {
-        return String.join(", ", config.successions.stream().map(s -> s.getID().substring(0, 8)).toList());
+        return String.join(", ",
+                config.successions.stream().map(s -> s.getID().substring(0, 8)).toList());
     }
-    
-    // Formats the memory map as text, protected against the printing of complex objects (in case an assignment injects one).
+
     private String formatMemory(Map<String, Object> memory) {
         if (memory == null || memory.isEmpty()) return "";
-        
         String cleanMem = memory.entrySet().stream()
                 .filter(entry -> entry.getValue() != null && !(entry.getValue() instanceof Element))
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.joining(", "));
-                
         return cleanMem.isEmpty() ? "" : " | Memory: {" + cleanMem + "}";
     }
 
     private boolean evaluateStep(String atom, Step<INode, SysMLV2Configuration> step) {
         atom = atom.trim();
-        SysMLV2Configuration startConfig  = step.start();
+        SysMLV2Configuration startConfig = step.start();
         SysMLV2Configuration targetConfig = step.end() != null ? step.end() : step.start();
         INode actionNode = step.action().orElse(null);
 
         if ("done".equals(atom) || "deadlock".equals(atom)) {
             return targetConfig.successions.isEmpty() && targetConfig.flows.isEmpty();
         }
-
         try {
             StepWrapper root = new StepWrapper(startConfig, actionNode, targetConfig);
             StandardEvaluationContext ctx = new StandardEvaluationContext(root);

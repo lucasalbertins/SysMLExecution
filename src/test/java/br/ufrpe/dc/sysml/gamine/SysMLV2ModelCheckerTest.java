@@ -18,7 +18,7 @@ public class SysMLV2ModelCheckerTest {
     @BeforeEach
     void init() {
         var spec = new SysMLV2Spec();
-        spec.parseFile("control/NewDecisionNodeExample.sysml");
+        spec.parseFile("control/BatteryExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         registry = new ActionUsageAdapterRegistry(rootNamespace);
         System.out.println("===== New SysML AST loaded for testing =====");

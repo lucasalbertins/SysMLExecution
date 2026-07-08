@@ -19,7 +19,7 @@ public class MoGPSLModelChecker {
 
     public static void init() {
         spec = new SysMLV2Spec();
-        spec.parseFile("control/NewDecisionNodeExample.sysml");
+        spec.parseFile("control/BatteryExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         System.out.println("NewDecisionNodeExample.sysml loaded");
         registry = new ActionUsageAdapterRegistry(rootNamespace);

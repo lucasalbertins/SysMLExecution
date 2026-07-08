@@ -25,7 +25,7 @@ public class TransitionUsageAdapterTest extends SysMLInteractiveTest {
     @BeforeAll
     static void init() {
         spec = new SysMLV2Spec();
-        spec.parseFile("control/NewDecisionNodeExample.sysml");
+        spec.parseFile("control/BatteryExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         assertNotNull(rootNamespace, "Namespace cannot be null.");
         registry = new ActionUsageAdapterRegistry(rootNamespace);
