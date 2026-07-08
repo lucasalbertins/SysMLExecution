@@ -17,7 +17,7 @@ public class SysMLV2ModelChecker {
 
     public record VerificationResult(
             boolean holds, // indica se foi comprovado ou não
-            int steps, // indica o número de etapas que levou para provar/descomprovar
+            int steps, // indica o número de etapas que levou para provar
             String witness) { // mostra quem descomprova (contraexemplo)
 
         @Override
