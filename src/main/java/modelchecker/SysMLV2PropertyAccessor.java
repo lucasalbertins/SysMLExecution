@@ -1,11 +1,5 @@
 package modelchecker;
 
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Expression;
-import org.omg.sysml.lang.sysml.Feature;
-import org.omg.sysml.lang.sysml.Namespace;
-import org.omg.sysml.util.EvaluationUtil;
-import org.omg.sysml.util.FeatureUtil;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
@@ -13,16 +7,15 @@ import org.springframework.expression.TypedValue;
 
 import semantics.actions.domain.SysMLV2Configuration;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 public class SysMLV2PropertyAccessor implements PropertyAccessor {
 
-    private final Namespace rootNamespace;
-    private final Map<String, Feature> featureCache = new HashMap<>();
+    private final Map<String, Object> globalMemoryFallback;
 
-    public SysMLV2PropertyAccessor(Namespace rootNamespace) {
-        this.rootNamespace = rootNamespace;
+    public SysMLV2PropertyAccessor(Map<String, Object> initialMemory) {
+        this.globalMemoryFallback = initialMemory != null ? initialMemory : new HashMap<>();
     }
 
     @Override
@@ -40,15 +33,14 @@ public class SysMLV2PropertyAccessor implements PropertyAccessor {
 
     @Override
     public TypedValue read(EvaluationContext context, Object target, String name) throws AccessException {
-
         if (target instanceof SysMLV2GPSLModelChecker.StepWrapper wrapper) {
             switch (name) {
-                case "source":     return new TypedValue(wrapper.source());
-                case "target":     return new TypedValue(wrapper.target());
-                case "action":     return new TypedValue(wrapper.action());
+                case "source": return new TypedValue(wrapper.source());
+                case "target": return new TypedValue(wrapper.target());
+                case "action": return new TypedValue(wrapper.action());
                 case "actionName":
                     var action = wrapper.action();
-                    return new TypedValue(action != null ? action.getDeclaredName() : null);
+                    return new TypedValue(action != null ? action.getName() : null);
             }
             return readFromConfiguration(wrapper.target(), name);
         }
@@ -57,32 +49,25 @@ public class SysMLV2PropertyAccessor implements PropertyAccessor {
             return readFromConfiguration(config, name);
         }
 
-        throw new AccessException("SysML Feature '" + name + "' not found.");
+        throw new AccessException("Property '" + name + "' not found.");
     }
 
-
     private TypedValue readFromConfiguration(SysMLV2Configuration config, String name) throws AccessException {
-
         if ("successions".equals(name)) return new TypedValue(config.successions);
         if ("flows".equals(name))       return new TypedValue(config.flows);
         if ("memory".equals(name))      return new TypedValue(config.memory);
 
+        // 1. Current state in dynamic memory
         if (config.memory != null && config.memory.containsKey(name)) {
             return new TypedValue(config.memory.get(name));
         }
 
-        if (rootNamespace != null) {
-            Feature f = featureCache.computeIfAbsent(name, n -> search(rootNamespace, n));
-            if (f != null) {
-                Expression e = FeatureUtil.getValueExpressionFor(f);
-                if (e != null) {
-                    Object val = EvaluationUtil.valueOf(e);
-                    return new TypedValue(val);
-                }
-            }
+        // 2. Global memory
+        if (globalMemoryFallback.containsKey(name)) {
+            return new TypedValue(globalMemoryFallback.get(name));
         }
 
-        throw new AccessException("SysML Feature '" + name + "' not found.");
+        throw new AccessException("Property '" + name + "' not found in current state or global memory.");
     }
 
     @Override
@@ -93,17 +78,6 @@ public class SysMLV2PropertyAccessor implements PropertyAccessor {
     @Override
     public void write(EvaluationContext context, Object target, String name, Object newValue) {
         throw new UnsupportedOperationException(
-            "Variable writing should be performed by ActionNodes, not by the logic evaluator.");
-    }
-
-    private Feature search(Element e, String name) {
-        if (e instanceof Feature f && name.equals(f.getDeclaredName())) return f;
-        if (e instanceof Namespace ns) {
-            for (Element child : ns.getOwnedMember()) {
-                Feature found = search(child, name);
-                if (found != null) return found;
-            }
-        }
-        return null;
+            "Variable writing should be performed by ActionNodes semantics, not by the SpEL evaluator.");
     }
 }

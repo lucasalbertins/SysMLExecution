@@ -1,17 +1,8 @@
 package modelchecker;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.omg.sysml.lang.sysml.ActionDefinition;
-import org.omg.sysml.lang.sysml.ActionUsage;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Expression;
-import org.omg.sysml.lang.sysml.Feature;
-import org.omg.sysml.lang.sysml.Namespace;
-import org.omg.sysml.util.EvaluationUtil;
-import org.omg.sysml.util.FeatureUtil;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -52,36 +43,9 @@ public class SysMLV2GPSLModelChecker {
         }
     }
 
-    public SysMLV2GPSLModelChecker(ActionUsageAdapter usage, Namespace root) {
-        Map<String, Object> initialMemory = collectInitialMemory(root);
+    public SysMLV2GPSLModelChecker(ActionUsageAdapter usage, Map<String, Object> initialMemory) {
         this.semantics = new SysMLV2ActionSemantics(usage, initialMemory);
-        this.propertyAccessor = new SysMLV2PropertyAccessor(root);
-    }
-
-    private static Map<String, Object> collectInitialMemory(Namespace root) {
-        Map<String, Object> mem = new HashMap<>();
-        if (root != null) collectFromElement(root, mem);
-        return mem;
-    }
-
-    private static void collectFromElement(Element e, Map<String, Object> mem) {
-        if (e instanceof Feature f
-                && !(e instanceof ActionUsage)
-                && !(e instanceof ActionDefinition)
-                && f.getDeclaredName() != null) {
-            Expression expr = FeatureUtil.getValueExpressionFor(f);
-            if (expr != null) {
-                Object val = EvaluationUtil.valueOf(expr);
-                if (val != null && !(val instanceof Element)) {
-                    mem.put(f.getDeclaredName(), val);
-                }
-            }
-        }
-        if (e instanceof Namespace ns) {
-            for (Element child : ns.getOwnedMember()) {
-                collectFromElement(child, mem);
-            }
-        }
+        this.propertyAccessor = new SysMLV2PropertyAccessor(initialMemory);
     }
 
     public VerificationResult check(String gpslProperty) {
@@ -144,8 +108,8 @@ public class SysMLV2GPSLModelChecker {
                         
                         if (wasConsumed && srcSucc.getTarget() != null) {
                             INode actionNode = srcSucc.getTarget();
-                            actionName = actionNode.getDeclaredName() != null 
-                                            ? actionNode.getDeclaredName() 
+                            actionName = actionNode.getName() != null 
+                                            ? actionNode.getName() 
                                             : actionNode.getClass().getSimpleName();
                             break;
                         }
@@ -173,7 +137,7 @@ public class SysMLV2GPSLModelChecker {
     private String formatMemory(Map<String, Object> memory) {
         if (memory == null || memory.isEmpty()) return "";
         String cleanMem = memory.entrySet().stream()
-                .filter(entry -> entry.getValue() != null && !(entry.getValue() instanceof Element))
+                .filter(entry -> entry.getValue() != null)
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.joining(", "));
         return cleanMem.isEmpty() ? "" : " | Memory: {" + cleanMem + "}";

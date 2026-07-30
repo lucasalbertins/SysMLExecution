@@ -3,6 +3,8 @@ package br.ufrpe.dc.sysml.gamine;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +14,7 @@ import org.omg.sysml.lang.sysml.Namespace;
 
 import adapters.sv2pi.behavior.actions.ActionUsageAdapter;
 import adapters.sv2pi.behavior.actions.ActionUsageAdapterRegistry;
+import adapters.sv2pi.utils.SysMLV2MemoryExtractor;
 import modelchecker.SysMLV2GPSLModelChecker;
 import parser.SysMLV2Spec;
 
@@ -19,6 +22,7 @@ public class SysMLV2GPSLModelCheckerTest {
 
     private Namespace rootNamespace;
     private ActionUsageAdapterRegistry registry;
+    private Map<String, Object> initialMemory;
 
     @BeforeEach
     void init() {
@@ -26,19 +30,20 @@ public class SysMLV2GPSLModelCheckerTest {
         spec.parseFile("control/BatteryExample.sysml");
         rootNamespace = (Namespace) spec.getRootNamespace();
         registry = new ActionUsageAdapterRegistry(rootNamespace);
+        initialMemory = SysMLV2MemoryExtractor.extract(rootNamespace);
         System.out.println("\n===== SysML AST loaded for Wrapper testing =====");
     }
 
     private SysMLV2GPSLModelChecker gpslChecker(String action) {
         ActionUsageAdapter ua = registry.getByDeclaredName(action).getFirst();
-        return new SysMLV2GPSLModelChecker(ua, rootNamespace);
+        return new SysMLV2GPSLModelChecker(ua, initialMemory);
     }
 
     @Nested
     @DisplayName("Transition-Based Tests (Source vs. Target)")
     class TransitionProperties {
 
-    	@Test
+        @Test
         @DisplayName("Ensures the battery level never decreases (Always Target >= Source).")
         void batteryNeverDecreases() {
             var result = gpslChecker("chargeBattery")
@@ -48,7 +53,7 @@ public class SysMLV2GPSLModelCheckerTest {
                 "Expected: battery decreases from 110 to 100 in endCharging.");
         }
 
-    	
+        
         @Test
         @DisplayName("Checks if a specific change occurs in the variable.")
         void verifySpecificChargeIncrement() {
