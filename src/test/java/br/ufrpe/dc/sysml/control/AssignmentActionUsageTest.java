@@ -13,8 +13,8 @@ import org.omg.sysml.lang.sysml.AssignmentActionUsage;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import adapters.behavior.actions.nodes.AssignmentActionUsageAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import adapters.sv2pi.behavior.actions.nodes.AssignmentActionUsageAdapter;
+import parser.SysMLV2Spec;
 
 public class AssignmentActionUsageTest {
 	

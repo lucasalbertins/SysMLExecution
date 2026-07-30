@@ -6,15 +6,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import adapters.behavior.actions.ActionUsageAdapter;
-import adapters.behavior.actions.ActionUsageAdapterRegistry;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
-
-import gamine.SysMLV2ActionSemantics;
+import adapters.sv2pi.behavior.actions.ActionUsageAdapter;
+import adapters.sv2pi.behavior.actions.ActionUsageAdapterRegistry;
 import obp3.Sequencer;
-import obp3.sli.core.operators.SemanticRelation2RootedGraph;
 import obp3.sli.core.operators.ToDetermistic;
-import obp3.traversal.dfs.DepthFirstTraversal;
+import parser.SysMLV2Spec;
+import semantics.actions.domain.SysMLV2ActionSemantics;
 
 public class ForkJoinNodeGamineTest {
 	

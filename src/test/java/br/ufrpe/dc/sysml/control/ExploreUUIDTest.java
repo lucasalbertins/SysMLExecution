@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import parser.SysMLV2Spec;
 
 public class ExploreUUIDTest {
 

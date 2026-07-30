@@ -1,6 +1,10 @@
 package br.ufrpe.dc.sysml.control;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +19,8 @@ import org.omg.sysml.lang.sysml.JoinNode;
 import org.omg.sysml.lang.sysml.MergeNode;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import adapters.behavior.actions.nodes.ControlNodeAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import adapters.sv2pi.behavior.actions.nodes.ControlNodeAdapter;
+import parser.SysMLV2Spec;
 
 public class ControlNodeAdapterTest {
 

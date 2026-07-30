@@ -1,6 +1,9 @@
 package br.ufrpe.dc.sysml.control;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,15 +17,15 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.impl.ActionUsageImpl;
 
-import adapters.behavior.actions.ActionDefinitionAdapter;
-import adapters.behavior.actions.ActionDefinitionAdapterRegistry;
-import adapters.behavior.actions.ActionUsageAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import adapters.sv2pi.behavior.actions.ActionDefinitionAdapter;
+import adapters.sv2pi.behavior.actions.ActionDefinitionAdapterRegistry;
+import adapters.sv2pi.behavior.actions.ActionUsageAdapter;
 import interfaces.behavior.actions.nodes.IFlow;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.behavior.actions.nodes.INode;
 import interfaces.utils.INamedElement;
 import interfaces.utils.IParameter;
+import parser.SysMLV2Spec;
 
 public class ActionUsageAdapterTest {
 

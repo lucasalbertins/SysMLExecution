@@ -1,7 +1,8 @@
 package interfaces.behavior.actions.nodes;
 
 import java.util.List;
-import gamine.domain.SysMLV2Configuration;
+
+import semantics.actions.domain.SysMLV2Configuration;
 
 public interface INodeCommand {
     

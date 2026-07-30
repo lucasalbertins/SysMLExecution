@@ -1,6 +1,9 @@
 package br.ufrpe.dc.sysml.control;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,10 +17,9 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.TransitionUsage;
 
-import adapters.behavior.actions.nodes.NodeAdapter;
+import adapters.sv2pi.behavior.actions.nodes.NodeAdapter;
 import interfaces.behavior.actions.ISuccession;
-
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import parser.SysMLV2Spec;
 
 public class NodeAdapterTest {
 

@@ -1,6 +1,8 @@
 package br.ufrpe.dc.sysml.control;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,11 +14,10 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.FlowUsage;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import adapters.behavior.actions.nodes.FlowUsageAdapter;
+import adapters.sv2pi.behavior.actions.nodes.FlowUsageAdapter;
 import interfaces.behavior.actions.nodes.IFlowEnd;
 import interfaces.utils.INamedElement;
-
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import parser.SysMLV2Spec;
 
 public class FlowUsageAdapterTest {
 

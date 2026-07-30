@@ -2,8 +2,8 @@ package br.ufrpe.dc.sysml.control;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,205 +18,194 @@ import org.omg.sysml.lang.sysml.LiteralString;
 import org.omg.sysml.lang.sysml.DecisionNode;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.OperatorExpression;
-import org.omg.sysml.lang.sysml.ReferenceUsage;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
-import org.omg.sysml.lang.sysml.Expression; // expressao de guarda
 
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import parser.SysMLV2Spec;
 
-// OUTDATED
-class DecisionNodeTest {
-	private static SysMLV2Spec sysmlSpec;
-	private static Namespace rootNamespace;
+import org.omg.sysml.lang.sysml.Expression;
 
-	@BeforeAll
-	static void init() {
-		sysmlSpec = new SysMLV2Spec();
-		sysmlSpec.parseFile("control/DecisionExample.sysml");
-		rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
-		assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
-	}
+public class DecisionNodeTest {
+    private static SysMLV2Spec sysmlSpec;
+    private static Namespace rootNamespace;
 
-	private void printElementStructure(Element element, int indent) {
-		String prefix = " ".repeat(indent);
-		String className = element.getClass().getSimpleName();
-		String name = element.getDeclaredName() != null ? element.getDeclaredName() : "<no-name>";
-		System.out.printf("%s%s - %s%n", prefix, className, name);
+    @BeforeAll
+    public static void init() {
+        sysmlSpec = new SysMLV2Spec();
+        sysmlSpec.parseFile("control/DecisionExample.sysml");
+        rootNamespace = (Namespace) sysmlSpec.getRootNamespace();
+        assertNotNull(rootNamespace, "Namespace must not be null");
+    }
 
-		// Namespace recursion
-		if (element instanceof Namespace ns) {
-			for (Element child : ns.getOwnedMember()) {
-				printElementStructure(child, indent + 1);
-			}
-		}
+    private void printElementStructure(Element element, int indent) {
+        String prefix = " ".repeat(indent);
+        String className = element.getClass().getSimpleName();
+        String name = element.getDeclaredName() != null ? element.getDeclaredName() : "<no-name>";
+        System.out.printf("%s%s - %s%n", prefix, className, name);
 
-		// DecisionNode exploration
-		if (element instanceof DecisionNode dn) {
-			if (!dn.getOwnedFeature().isEmpty()) {
-				System.out.println(prefix + "Decision Node Features:");
-				for (Feature ffeat : dn.getOwnedFeature()) {
-					String fclass = ffeat.eClass().getName();
-					String fdecl = ffeat.getDeclaredName() != null
-							? ffeat.getDeclaredName()
-							: (ffeat.getName() != null ? ffeat.getName() : "<no-name>");
-					System.out.printf("%s  Owned Feature: %s - %s%n", prefix, fclass, fdecl);
-				}
-			} else {
-				System.out.printf("%sDecision node %s nao possui features%n", prefix, dn.getDeclaredName());
-			}
-		}
+        // Namespace recursion
+        if (element instanceof Namespace ns) {
+            for (Element child : ns.getOwnedMember()) {
+                printElementStructure(child, indent + 1);
+            }
+        }
 
-		// Succession connections (source/target)
-		if (element instanceof SuccessionAsUsage su) {
-			System.out.println(prefix + "SuccessionAsUsage:");
-			for (Element src : su.getSource()) {
-				String srcName = src.getDeclaredName() != null ? src.getDeclaredName() : "<no-name>";
-				System.out.printf("%s  Source -> %s (%s)%n", prefix, srcName, src.getClass().getSimpleName());
-			}
-			for (Element tgt : su.getTarget()) {
-				String tgtName = tgt.getDeclaredName() != null ? tgt.getDeclaredName() : "<no-name>";
-				System.out.printf("%s  Target -> %s (%s)%n", prefix, tgtName, tgt.getClass().getSimpleName());
-			}
-		}
+        // DecisionNode exploration
+        if (element instanceof DecisionNode dn) {
+            if (!dn.getOwnedFeature().isEmpty()) {
+                System.out.println(prefix + "Decision Node Features:");
+                // Avoid using Iterators if dealing with OMG Custom Lists, though getOwnedFeature is usually safe
+                for (int i = 0; i < dn.getOwnedFeature().size(); i++) {
+                    Feature ffeat = dn.getOwnedFeature().get(i);
+                    String fclass = ffeat.eClass().getName();
+                    String fdecl = ffeat.getDeclaredName() != null
+                            ? ffeat.getDeclaredName()
+                            : (ffeat.getName() != null ? ffeat.getName() : "<no-name>");
+                    System.out.printf("%s  Owned Feature: %s - %s%n", prefix, fclass, fdecl);
+                }
+            } else {
+                System.out.printf("%sDecision node %s doesn't have features%n", prefix, dn.getDeclaredName());
+            }
+        }
 
-		if (element instanceof Expression expr) {
-		    String exprStr = buildExpressionString(expr);
+        // Succession connections (source/target)
+        if (element instanceof SuccessionAsUsage su) {
+            System.out.println(prefix + "SuccessionAsUsage:");
+            for (int i = 0; i < su.getSource().size(); i++) {
+                Element src = su.getSource().get(i);
+                String srcName = src.getDeclaredName() != null ? src.getDeclaredName() : "<no-name>";
+                System.out.printf("%s  Source -> %s (%s)%n", prefix, srcName, src.getClass().getSimpleName());
+            }
+            for (int i = 0; i < su.getTarget().size(); i++) {
+                Element tgt = su.getTarget().get(i);
+                String tgtName = tgt.getDeclaredName() != null ? tgt.getDeclaredName() : "<no-name>";
+                System.out.printf("%s  Target -> %s (%s)%n", prefix, tgtName, tgt.getClass().getSimpleName());
+            }
+        }
 
-		    if (!exprStr.isBlank()) {
-		        System.out.printf("%sExpression (Simplified): %s%n", prefix, exprStr);
-		    } else {
-		        System.out.printf("%sExpression - %s (%s)%n",
-		                prefix,
-		                expr.getDeclaredName() != null ? expr.getDeclaredName() : "<no-name>",
-		                expr.eClass().getName());
-		    }
+        if (element instanceof Expression expr) {
+            String exprStr = buildExpressionString(expr);
 
-		    if (!(expr instanceof FeatureChainExpression)
-		            && !(expr instanceof FeatureReferenceExpression)
-		            && !(expr instanceof OperatorExpression)) {
-		        if (!expr.getOwnedFeature().isEmpty()) {
-		            System.out.printf("%s  Owned Features:%n", prefix);
-		            for (Feature feat : expr.getOwnedFeature()) {
-		                String fname = feat.getDeclaredName() != null ? feat.getDeclaredName() : "<no-name>";
-		                System.out.printf("%s    Feature: %s (%s)%n", prefix, fname, feat.eClass().getName());
-		            }
-		        }
-		    }
+            if (!exprStr.isBlank()) {
+                System.out.printf("%sExpression (Simplified): %s%n", prefix, exprStr);
+            } else {
+                System.out.printf("%sExpression - %s (%s)%n",
+                        prefix,
+                        expr.getDeclaredName() != null ? expr.getDeclaredName() : "<no-name>",
+                        expr.eClass().getName());
+            }
 
-			// Handle FeatureChainExpression
-			if (expr instanceof FeatureChainExpression fce) {
-				System.out.printf("%s  FeatureChainExpression:%n", prefix);
-				if (!fce.getFeature().isEmpty()) {
-					for (Feature f : fce.getFeature()) {
-						String fname = f.getDeclaredName() != null ? f.getDeclaredName() : "<no-name>";
-						System.out.printf("%s    Feature: %s (%s)%n", prefix, fname, f.getClass().getSimpleName());
-					}
-				}
-				if (fce.getTargetFeature() != null) {
-					System.out.printf("%s    TargetFeature -> %s%n", prefix, fce.getTargetFeature().getDeclaredName());
-				}
-				if (fce.sourceTargetFeature()!= null) {
-					System.out.printf("%s    SourceTargetFeature -> %s%n", prefix,
-							fce.sourceTargetFeature().getDeclaredName());
-				}
-			}
+            if (!(expr instanceof FeatureChainExpression)
+                    && !(expr instanceof FeatureReferenceExpression)
+                    && !(expr instanceof OperatorExpression)) {
+                if (!expr.getOwnedFeature().isEmpty()) {
+                    System.out.printf("%s  Owned Features:%n", prefix);
+                    for (int i = 0; i < expr.getOwnedFeature().size(); i++) {
+                        Feature feat = expr.getOwnedFeature().get(i);
+                        String fname = feat.getDeclaredName() != null ? feat.getDeclaredName() : "<no-name>";
+                        System.out.printf("%s    Feature: %s (%s)%n", prefix, fname, feat.eClass().getName());
+                    }
+                }
+            }
 
-			// Handle FeatureReferenceExpression
-			if (expr instanceof FeatureReferenceExpression fre) {
-				System.out.printf("%s  FeatureReferenceExpression:%n", prefix);
-				if (fre.getReferent() != null) {
-					String referentName = fre.getReferent().getDeclaredName() != null
-							? fre.getReferent().getDeclaredName()
-							: "<no-referent>";
-					System.out.printf("%s    Referent -> %s (%s)%n", prefix, referentName,
-							fre.getReferent().getClass().getSimpleName());
-				} else {
-					System.out.printf("%s    Nenhum Referent%n", prefix);
-				}
-			}
-			
-			if (expr instanceof OperatorExpression op) {
-			    System.out.println(prefix + "Guard Expression String: " + buildExpressionString(op));
-			}
+            // Handle FeatureChainExpression
+            if (expr instanceof FeatureChainExpression fce) {
+                System.out.printf("%s  FeatureChainExpression:%n", prefix);
+                if (!fce.getFeature().isEmpty()) {
+                    for (int i = 0; i < fce.getFeature().size(); i++) {
+                        Feature f = fce.getFeature().get(i);
+                        String fname = f.getDeclaredName() != null ? f.getDeclaredName() : "<no-name>";
+                        System.out.printf("%s    Feature: %s (%s)%n", prefix, fname, f.getClass().getSimpleName());
+                    }
+                }
+                if (fce.getTargetFeature() != null) {
+                    System.out.printf("%s    TargetFeature -> %s%n", prefix, fce.getTargetFeature().getDeclaredName());
+                }
+            }
 
+            // Handle FeatureReferenceExpression
+            if (expr instanceof FeatureReferenceExpression fre) {
+                System.out.printf("%s  FeatureReferenceExpression:%n", prefix);
+                if (fre.getReferent() != null) {
+                    String referentName = fre.getReferent().getDeclaredName() != null
+                            ? fre.getReferent().getDeclaredName()
+                            : "<no-referent>";
+                    System.out.printf("%s    Referent -> %s (%s)%n", prefix, referentName,
+                            fre.getReferent().getClass().getSimpleName());
+                } else {
+                    System.out.printf("%s    No Referent%n", prefix);
+                }
+            }
+            
+            if (expr instanceof OperatorExpression op) {
+                System.out.println(prefix + "Guard Expression String: " + buildExpressionString(op));
+            }
+        }
+    }
+    
+    private static String buildExpressionString(Expression expr) {
+        if (expr == null) return "";
 
-			// Owned features of the Expression
-			if (!expr.getOwnedFeature().isEmpty()) {
-				System.out.printf("%s  Owned Features:%n", prefix);
-				for (Feature feat : expr.getOwnedFeature()) {
-					String fname = feat.getDeclaredName() != null ? feat.getDeclaredName() : "<no-name>";
-					System.out.printf("%s    Feature: %s (%s)%n", prefix, fname, feat.eClass().getName());
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Retorna uma representação textual limpa da expressão,
-	 * extraindo apenas as partes relevantes (operandos, operadores e targetFeature).
-	 */
-	private static String buildExpressionString(Expression expr) {
-	    if (expr == null) return "";
+        // OperatorExpression (ex: monitor.batteryCharge < 100)
+        if (expr instanceof OperatorExpression op) {
+            String operator = op.getOperator() != null ? op.getOperator() : "";
+            
+            List<String> operands = new ArrayList<>();
+            // OperandEList doesn't work properly with iterator() and stream()
+            for (int i = 0; i < op.getOperand().size(); i++) {
+                String s = buildExpressionString(op.getOperand().get(i));
+                if (!s.isBlank()) {
+                    operands.add(s);
+                }
+            }
 
-	    // Caso 1️⃣: OperatorExpression → combina operandos e operador (ex: monitor.batteryCharge < 100)
-	    if (expr instanceof OperatorExpression op) {
-	        String operator = op.getOperator() != null ? op.getOperator() : "";
+            if (operands.size() == 2) {
+                return operands.get(0) + " " + operator + " " + operands.get(1);
+            } else if (operands.size() == 1) {
+                return operator + " " + operands.get(0);
+            } else if (!operands.isEmpty()) {
+                return String.join(" " + operator + " ", operands);
+            }
+        }
 
-	        List<String> operands = op.getOperand().stream()
-	                .map(DecisionNodeTest::buildExpressionString)
-	                .filter(s -> !s.isBlank())
-	                .toList();
+        // FeatureChainExpression (ex: batteryCharge)
+        if (expr instanceof FeatureChainExpression chain) {
+            String left = "";
+            if (!chain.getOperand().isEmpty()) {
+                left = buildExpressionString(chain.getOperand().get(0));
+            }
 
-	        if (operands.size() == 2) {
-	            return operands.get(0) + " " + operator + " " + operands.get(1);
-	        } else if (operands.size() == 1) {
-	            return operator + " " + operands.get(0);
-	        } else {
-	            return String.join(" " + operator + " ", operands);
-	        }
-	    }
+            String targetName = (chain.getTargetFeature() != null
+                    && chain.getTargetFeature().namingFeature() != null)
+                    ? chain.getTargetFeature().namingFeature().effectiveName()
+                    : "";
 
-	    // Caso 2️⃣: FeatureChainExpression → pega apenas o nome do targetFeature (ex: batteryCharge)
-	    if (expr instanceof FeatureChainExpression chain) {
-	        // Operand (geralmente uma FeatureReferenceExpression → "monitor")
-	        String left = "";
-	        if (!chain.getOperand().isEmpty()) {
-	            left = buildExpressionString(chain.getOperand().getFirst());
-	        }
+            if (!left.isBlank() && !targetName.isBlank()) {
+                return left + "." + targetName;
+            }
+            return targetName.isBlank() ? left : targetName;
+        }
 
-	        // TargetFeature (ex: batteryCharge)
-	        String targetName = (chain.getTargetFeature() != null
-	                && chain.getTargetFeature().namingFeature() != null)
-	                ? chain.getTargetFeature().namingFeature().effectiveName()
-	                : "";
+        // FeatureReferenceExpression (ex: monitor)
+        if (expr instanceof FeatureReferenceExpression ref) {
+            if (ref.getReferent() != null && ref.getReferent().namingFeature() != null) {
+                return ref.getReferent().namingFeature().effectiveName();
+            }
+            return "<ref>";
+        }
 
-	        if (!left.isBlank() && !targetName.isBlank()) {
-	            return left + "." + targetName;
-	        }
-	        return targetName.isBlank() ? left : targetName;
-	    }
+        // Literals (ex: 100, true, "abc")
+        if (expr instanceof LiteralInteger litInt) return String.valueOf(litInt.getValue());
+        if (expr instanceof LiteralBoolean litBool) return String.valueOf(litBool.isValue());
+        if (expr instanceof LiteralRational litReal) return String.valueOf(litReal.getValue());
+        if (expr instanceof LiteralString litStr) return "\"" + litStr.getValue() + "\"";
 
-	    // Caso 3️⃣: FeatureReferenceExpression → retorna apenas o nome do referent (ex: monitor)
-	    if (expr instanceof FeatureReferenceExpression ref) {
-	        if (ref.getReferent() != null && ref.getReferent().namingFeature() != null) {
-	            return ref.getReferent().namingFeature().effectiveName();
-	        }
-	        return "<ref>";
-	    }
+        return "";
+    }
 
-	    // Caso 4️⃣: Literais (ex: 100, true, "abc")
-	    if (expr instanceof LiteralInteger litInt) return String.valueOf(litInt.getValue());
-	    if (expr instanceof LiteralBoolean litBool) return String.valueOf(litBool.isValue());
-	    if (expr instanceof LiteralRational litReal) return String.valueOf(litReal.getValue());
-	    if (expr instanceof LiteralString litStr) return "\"" + litStr.getValue() + "\"";
-
-	    return "";
-	}
-
-	@Test
-	void testPrintFullModelStructure() {
-		assertNotNull(rootNamespace, "Namespace raiz não deve ser nulo");
-		System.out.println("=== FULL MODEL STRUCTURE ===");
-		printElementStructure(rootNamespace, 0);
-	}
+    @Test
+    void testPrintFullModelStructure() {
+        assertNotNull(rootNamespace, "Root namespace must not be null");
+        System.out.println("=== EXPLORER: FULL MODEL AST STRUCTURE ===");
+        printElementStructure(rootNamespace, 0);
+    }
 }

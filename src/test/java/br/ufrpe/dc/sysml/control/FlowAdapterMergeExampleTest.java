@@ -1,8 +1,10 @@
 package br.ufrpe.dc.sysml.control;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,11 +19,10 @@ import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FlowUsage;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import adapters.behavior.actions.nodes.FlowUsageAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import adapters.sv2pi.behavior.actions.nodes.FlowUsageAdapter;
 import interfaces.behavior.actions.nodes.IFlowEnd;
+import parser.SysMLV2Spec;
 
-// OUTDATED
 public class FlowAdapterMergeExampleTest {
 
     @Test
@@ -30,13 +31,13 @@ public class FlowAdapterMergeExampleTest {
         spec.parseFile("control/MergeExample.sysml");
 
         Namespace root = (Namespace) spec.getRootNamespace();
-        assertNotNull(root, "Namespace raiz não deve ser nulo");
+        assertNotNull(root, "Namespace must not be null");
 
         List<FlowUsage> flows = new LinkedList<>();
         collectAllFlowUsages(root, flows);
-        assertFalse(flows.isEmpty(), "Esperava encontrar FlowUsage(s) no MergeExample");
+        assertFalse(flows.isEmpty(), "Expected to find FlowUsage(s) in MergeExample");
 
-        // expected mappings (source->target)
+        // Expected mappings (source->target)
         Set<String> expected = new HashSet<>();
         expected.add("trigger.scene->focus.scene");
         expected.add("focus.image->shoot.image");
@@ -53,48 +54,75 @@ public class FlowAdapterMergeExampleTest {
             System.out.println("Adapter.getPayload(): " + adapter.getPayload());
             System.out.println("Adapter.getSource(): " + adapter.getSource());
             System.out.println("Adapter.getTarget(): " + adapter.getTarget());
-            System.out.println("Adapter.toString(): " + adapter.toString());
             System.out.println("---------------------------------------------------");
 
             // MergeExample: no payload, no name
-            assertNull(adapter.getPayload(), "MergeExample flow não deve ter payload");
-            assertNull(adapter.getName(), "MergeExample flow não deve ter declaredName");
+            assertNull(adapter.getPayload(), "MergeExample flow must not have a payload");
+            assertEquals(adapter.getName(), "<no-name>", "MergeExample flow must not have a name");
 
-            // source and target must be present
+            // Source and target must be present
             IFlowEnd s = adapter.getSource();
             IFlowEnd t = adapter.getTarget();
-            assertNotNull(s, "Fonte do flow não deve ser nula");
-            assertNotNull(t, "Alvo do flow não deve ser nulo");
 
-            String mapping = s + "->" + t;
+            String sourceName = extractFlowEndName(s);
+            String targetName = extractFlowEndName(t);
+            String mapping = sourceName + "->" + targetName;
+            
             assertTrue(expected.contains(mapping),
-                "Mapping inesperado encontrado: " + mapping + " (esperados: " + expected + ")");
+                "Unexpected mapping found: " + mapping + " (remaining expected: " + expected + ")");
             expected.remove(mapping);
         }
 
         // all expected should be matched
-        assertTrue(expected.isEmpty(), "Algum mapping esperado não foi encontrado: " + expected);
+        assertTrue(expected.isEmpty(), "A expected mapping was not found: " + expected);
     }
     
-    // Interessante criar uma classe Helper para fazer isso
+    private String extractFlowEndName(IFlowEnd fe) {
+        if (fe == null) return "null";
+        
+        String nodeName = "";
+        String varName = "";
+        
+        if (fe.getReferencedFeature() != null && fe.getReferencedFeature().getName() != null) {
+            nodeName = fe.getReferencedFeature().getName();
+        }
+        
+        if (fe.getReferenceUsage() != null && fe.getReferenceUsage().getName() != null) {
+            varName = fe.getReferenceUsage().getName();
+            if (varName.contains("<no-name>")) {
+                varName = "";
+            }
+        }
+        
+        if (!nodeName.isEmpty() && !varName.isEmpty()) {
+            return nodeName + "." + varName;
+        } else if (!nodeName.isEmpty()) {
+            return nodeName; // Fallback
+        } else {
+            return fe.getName(); // Fallback
+        }
+    }
+    
+    // Helper
     private void collectAllFlowUsages(Element elt, List<FlowUsage> out) {
         if (elt == null) return;
+        
         if (elt instanceof FlowUsage fu) {
             out.add(fu);
         }
+        
         if (elt instanceof Namespace ns) {
-            for (Element child : ns.getOwnedMember()) {
-                collectAllFlowUsages(child, out);
+            for (int i = 0; i < ns.getOwnedMember().size(); i++) {
+                collectAllFlowUsages(ns.getOwnedMember().get(i), out);
             }
         } else {
             try {
                 if (elt instanceof Feature f) {
-                    for (Feature child : f.getOwnedFeature()) {
-                        collectAllFlowUsages(child, out);
+                    for (int i = 0; i < f.getOwnedFeature().size(); i++) {
+                        collectAllFlowUsages(f.getOwnedFeature().get(i), out);
                     }
                 }
             } catch (Exception ex) {
-                // ignore
             }
         }
     }

@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.omg.sysml.lang.sysml.Namespace;
 
-import adapters.behavior.actions.ActionUsageAdapter;
-import adapters.behavior.actions.ActionUsageAdapterRegistry;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
-import gamine.SysMLV2GPSLModelChecker;
+import adapters.sv2pi.behavior.actions.ActionUsageAdapter;
+import adapters.sv2pi.behavior.actions.ActionUsageAdapterRegistry;
+import modelchecker.SysMLV2GPSLModelChecker;
+import parser.SysMLV2Spec;
 
 public class SysMLV2GPSLModelCheckerTest {
 
@@ -38,7 +38,6 @@ public class SysMLV2GPSLModelCheckerTest {
     @DisplayName("Transition-Based Tests (Source vs. Target)")
     class TransitionProperties {
 
-    	@Disabled
     	@Test
         @DisplayName("Ensures the battery level never decreases (Always Target >= Source).")
         void batteryNeverDecreases() {
@@ -65,7 +64,6 @@ public class SysMLV2GPSLModelCheckerTest {
     @DisplayName("Action and Event-Based Tests (ActionName)")
     class ActionProperties {
 
-    	@Disabled
         @Test
         @DisplayName("Whenever 'endCharging' is executed, the 'isCharging' flag on the target is set to false.")
         void actionEffectsOnTarget() {
@@ -76,7 +74,6 @@ public class SysMLV2GPSLModelCheckerTest {
                 "The execution of endCharging must have the immediate effect of turning off the flag.");
         }
 
-    	@Disabled
         @Test
         @DisplayName("The 'addCharge' action must eventually be executed.")
         void specificActionEventuallyRuns() {
@@ -92,7 +89,6 @@ public class SysMLV2GPSLModelCheckerTest {
     @DisplayName("Topology Tests (Deadlock / Done)")
     class TopologicalProperties {
 
-    	@Disabled
         @Test
         @DisplayName("The system must complete successfully.")
         void systemTerminates() {
@@ -107,7 +103,6 @@ public class SysMLV2GPSLModelCheckerTest {
     @DisplayName("Compatibility with Legacy Properties (Implicit Target)")
     class BackwardCompatibility {
 
-    	@Disabled
         @Test
         @DisplayName("Variables accessed directly refer to the Target.")
         void directVariableAccess() {

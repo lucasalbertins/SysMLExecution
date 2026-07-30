@@ -12,9 +12,9 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.TransitionUsage;
 
-import adapters.behavior.actions.ActionUsageAdapterRegistry;
-import adapters.behavior.actions.nodes.TransitionUsageAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import adapters.sv2pi.behavior.actions.ActionUsageAdapterRegistry;
+import adapters.sv2pi.behavior.actions.nodes.TransitionUsageAdapter;
+import parser.SysMLV2Spec;
 
 public class TransitionUsageAdapterTest extends SysMLInteractiveTest {
 	

@@ -14,7 +14,7 @@ import org.omg.sysml.lang.sysml.ReferenceUsage;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 import org.omg.sysml.lang.sysml.Usage;
 
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import parser.SysMLV2Spec;
 
 public class DecisionControlTest {
 	private static SysMLV2Spec sysmlSpec;

@@ -13,10 +13,8 @@ import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.TerminateActionUsage;
 
-import adapters.behavior.actions.nodes.TerminateActionUsageAdapter;
-import br.ufrpe.dc.sysml.SysMLV2Spec;
-import interfaces.behavior.actions.nodes.IFlowEnd;
-import interfaces.utils.INamedElement;
+import adapters.sv2pi.behavior.actions.nodes.TerminateActionUsageAdapter;
+import parser.SysMLV2Spec;
 
 public class TerminateActionUsageTest {
 	

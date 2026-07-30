@@ -10,7 +10,7 @@ import org.omg.sysml.lang.sysml.JoinNode;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.SuccessionAsUsage;
 
-import br.ufrpe.dc.sysml.SysMLV2Spec;
+import parser.SysMLV2Spec;
 
 public class DeviceTest {
 	
